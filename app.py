@@ -119,7 +119,6 @@ if uploaded_file:
             background-color: #e6ffe6; /* soft green background */
             color: #1a1a1a; /* darker text */
             border-color: #1e8f1e; /* slightly darker green border */
-            transform: scale(1.02);
         }
         </style>
         """
@@ -136,6 +135,7 @@ if uploaded_file:
         st.error(f"❌ Error processing file: {e}")
 else:
     st.info("👆 გთხოვთ ატვირტოთ ფაილი დასათვლელად")
+
 
 
 
