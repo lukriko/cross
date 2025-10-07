@@ -5,7 +5,7 @@ from io import BytesIO
 import seaborn as sns
 
 # --- Password ---
-PASSWORD = "your_password_here"  # change this to your password
+PASSWORD = "123"  # change this to your password
 password_input = st.text_input("Enter password:", type="password")
 
 if password_input != PASSWORD:
@@ -109,3 +109,4 @@ if uploaded_file:
         st.error(f"❌ Error processing file: {e}")
 else:
     st.info("👆 Please upload an Excel file to begin.")
+
