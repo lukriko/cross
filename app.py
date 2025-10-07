@@ -65,7 +65,7 @@ if uploaded_file:
 
         grouped2 = grouped2.sort_values(by='პროცენტულობა', ascending=False)
 
-        st.success("✅ Data processed successfully!")
+        st.success("✅ მონაცემები აიტვირთა წარმატებით!")
 
         # Show top 10 table
         st.subheader("თანამშრობლები ქროს-სელინგის მაჩვენებლით")
@@ -108,7 +108,8 @@ if uploaded_file:
     except Exception as e:
         st.error(f"❌ Error processing file: {e}")
 else:
-    st.info("👆 Please upload an Excel file to begin.")
+    st.info("👆 გთხოვთ ატვირტოთ ფაილი დასათვლელად")
+
 
 
 
