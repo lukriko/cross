@@ -6,20 +6,20 @@ import seaborn as sns
 
 # --- Password ---
 PASSWORD = "123"  # change this to your password
-password_input = st.text_input("Enter password:", type="password")
+password_input = st.text_input("პაროლი:", type="password")
 
 if password_input != PASSWORD:
-    st.warning("🔒 Please enter the correct password to access the app.")
+    st.warning("🔒 გთხოვთ შეიყვანოთ სწორი პაროლი")
     st.stop()  # stops execution if password is wrong
 
 # Streamlit page config
-st.set_page_config(page_title="Cross-Selling Analyzer", layout="wide")
+st.set_page_config(page_title="ქროს-სელინგის პროცენტული მაჩვენებელი", layout="wide")
 
-st.title("🛒 Cross-Selling Analyzer")
-st.write("Upload your Excel file to calculate cross-selling performance by employee.")
+st.title("🛒ქროს-სელინგის პროცენტული მაჩვენებელი")
+st.write("ატვირთეთ ობიექტის რეალიზაცია(ექსელის ფორმატში)")
 
 # --- Upload Section ---
-uploaded_file = st.file_uploader("Upload Excel File", type=["xls", "xlsx"])
+uploaded_file = st.file_uploader("ატვირთვა", type=["xls", "xlsx"])
 
 if uploaded_file:
     try:
@@ -68,7 +68,7 @@ if uploaded_file:
         st.success("✅ Data processed successfully!")
 
         # Show top 10 table
-        st.subheader("Top 10 თანამშრომელი by Cross-Selling Rate")
+        st.subheader("თანამშრობლები ქროს-სელინგის მაჩვენებლით")
         st.dataframe(grouped2.head(10))
 
         # --- Small, Prettier Bar Chart ---
@@ -99,9 +99,9 @@ if uploaded_file:
         excel_data = output.getvalue()
 
         st.download_button(
-            label="📥 Download Results as Excel",
+            label="📥 გადმოწერა ექსელის ფორმატში",
             data=excel_data,
-            file_name="cross_selling_results.xlsx",
+            file_name="ქროს-სელინგი.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
 
@@ -109,6 +109,7 @@ if uploaded_file:
         st.error(f"❌ Error processing file: {e}")
 else:
     st.info("👆 Please upload an Excel file to begin.")
+
 
 
 
