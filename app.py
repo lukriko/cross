@@ -13,7 +13,7 @@ if password_input != PASSWORD:
     st.stop()
 
 # Streamlit page config
-st.set_page_config(page_title="ქროს-სელინგის პროცენტული მაჩვენებელი", layout="wide")
+st.set_page_config(page_title="ქროს-სელინგის მაჩვენებელი", layout="wide")
 
 st.title("🛒 ქროს-სელინგის პროცენტული მაჩვენებელი")
 st.write("ატვირთეთ ობიექტის რეალიზაცია (Excel ფორმატში)")
@@ -26,11 +26,12 @@ if uploaded_file:
 
         unwanted_categories = ['POP', 'COURIER', 'GIFT CARD', 'SERVICE']
         df_filtered = df_copy.copy()
-        df_filtered = df_filtered[df_filtered['თანხა'] != 0]
-        df_filtered = df_filtered[df_filtered['ფასი'] != 0]
-        df_filtered = df_filtered[df_filtered['ფასი 1'] != 0]
-        df_filtered = df_filtered[~df_filtered['პროდ. ჯგუფი'].isin(unwanted_categories)]
-        df_filtered = df_filtered.dropna(subset=['თანამშრომელი', 'ზედდებული'])
+        df_filtered = df_filtered[
+            (df_filtered['თანხა'] != 0)
+            & (df_filtered['ფასი'] != 0)
+            & (df_filtered['ფასი 1'] != 0)
+            & (~df_filtered['პროდ. ჯგუფი'].isin(unwanted_categories))
+        ].dropna(subset=['თანამშრომელი', 'ზედდებული'])
 
         grouped = (
             df_filtered.groupby(['თანამშრომელი', 'ზედდებული'])
@@ -66,38 +67,36 @@ if uploaded_file:
         st.subheader("ქროს-სელინგის გრაფიკი")
         st.markdown("---")
 
-        top = grouped2
-
-        # 🎯 Make small chart (real small)
+        top = grouped2.head(10)
         sns.set_style("whitegrid")
-        fig, ax = plt.subplots(figsize=(3, 1.5))  # ← tiny size now
-        bars = ax.barh(top['თანამშრომელი'], top['პროცენტულობა'], color='#2ca02c')
 
+        # --- TINY Chart ---
+        fig, ax = plt.subplots(figsize=(3.5, 2.2))  # ✅ much smaller
+        bars = ax.barh(top['თანამშრომელი'], top['პროცენტულობა'], color='#2ca02c', height=0.5)
         for bar in bars:
             width = bar.get_width()
-            ax.text(width + 0.3, bar.get_y() + bar.get_height()/2, f'{width}%', va='center', fontsize=6)
-
-        ax.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=6)
-        ax.set_ylabel('თანამშრომელი', fontsize=6)
-        ax.tick_params(axis='both', which='major', labelsize=6)
+            ax.text(width + 0.5, bar.get_y() + bar.get_height()/1.6, f'{width}%', va='center', fontsize=6)
+        ax.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=7)
+        ax.set_ylabel('თანამშრომელი', fontsize=7)
+        ax.tick_params(axis='both', labelsize=6)
         ax.invert_yaxis()
-        ax.grid(True, axis='x', linestyle='--', alpha=0.6)
+        ax.grid(True, axis='x', linestyle='--', alpha=0.4)
         plt.tight_layout()
-        st.pyplot(fig)
+        st.pyplot(fig, use_container_width=False)  # ✅ disables stretch
 
-        # 🔍 Expander for full-size version
-        with st.expander("🔍 დააწკაპე გასადიდებლად"):
-            fig_big, ax_big = plt.subplots(figsize=(10, 5))
+        # --- Expandable larger chart ---
+        with st.expander("🔍 სრულად ნახვა / დახურვა"):
+            fig_big, ax_big = plt.subplots(figsize=(8, 4))  # moderately bigger
             bars_big = ax_big.barh(top['თანამშრომელი'], top['პროცენტულობა'], color='#2ca02c')
             for bar in bars_big:
                 width = bar.get_width()
-                ax_big.text(width + 0.5, bar.get_y() + bar.get_height()/2, f'{width}%', va='center', fontsize=10)
-            ax_big.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=12)
-            ax_big.set_ylabel('თანამშრომელი', fontsize=12)
+                ax_big.text(width + 0.7, bar.get_y() + bar.get_height()/2, f'{width}%', va='center', fontsize=9)
+            ax_big.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=10)
+            ax_big.set_ylabel('თანამშრომელი', fontsize=10)
             ax_big.invert_yaxis()
-            ax_big.grid(True, axis='x', linestyle='--', alpha=0.6)
+            ax_big.grid(True, axis='x', linestyle='--', alpha=0.5)
             plt.tight_layout()
-            st.pyplot(fig_big)
+            st.pyplot(fig_big, use_container_width=False)
 
         st.markdown("---")
 
@@ -107,6 +106,7 @@ if uploaded_file:
             grouped2.to_excel(writer, index=False, sheet_name='CrossSellingResults')
         excel_data = output.getvalue()
 
+        # Custom button style
         custom_button = """
         <style>
         div.stDownloadButton > button {
