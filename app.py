@@ -68,27 +68,30 @@ if uploaded_file:
 
         top = grouped2
 
-        # Small chart preview
+        # 🎯 Make small chart (real small)
         sns.set_style("whitegrid")
-        fig, ax = plt.subplots(figsize=(6, 3))
+        fig, ax = plt.subplots(figsize=(3, 1.5))  # ← tiny size now
         bars = ax.barh(top['თანამშრომელი'], top['პროცენტულობა'], color='#2ca02c')
+
         for bar in bars:
             width = bar.get_width()
-            ax.text(width + 1, bar.get_y() + bar.get_height()/1.56, f'{width}%', va='center', fontsize=9)
-        ax.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=10)
-        ax.set_ylabel('თანამშრომელი', fontsize=10)
+            ax.text(width + 0.3, bar.get_y() + bar.get_height()/2, f'{width}%', va='center', fontsize=6)
+
+        ax.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=6)
+        ax.set_ylabel('თანამშრომელი', fontsize=6)
+        ax.tick_params(axis='both', which='major', labelsize=6)
         ax.invert_yaxis()
         ax.grid(True, axis='x', linestyle='--', alpha=0.6)
         plt.tight_layout()
         st.pyplot(fig)
 
-        # --- Expandable larger chart ---
-        with st.expander("🔍 სრულად ნახვა / დახურვა"):
-            fig_big, ax_big = plt.subplots(figsize=(12, 6))
+        # 🔍 Expander for full-size version
+        with st.expander("🔍 დააწკაპე გასადიდებლად"):
+            fig_big, ax_big = plt.subplots(figsize=(10, 5))
             bars_big = ax_big.barh(top['თანამშრომელი'], top['პროცენტულობა'], color='#2ca02c')
             for bar in bars_big:
                 width = bar.get_width()
-                ax_big.text(width + 1, bar.get_y() + bar.get_height()/2, f'{width}%', va='center', fontsize=11)
+                ax_big.text(width + 0.5, bar.get_y() + bar.get_height()/2, f'{width}%', va='center', fontsize=10)
             ax_big.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=12)
             ax_big.set_ylabel('თანამშრომელი', fontsize=12)
             ax_big.invert_yaxis()
@@ -104,7 +107,6 @@ if uploaded_file:
             grouped2.to_excel(writer, index=False, sheet_name='CrossSellingResults')
         excel_data = output.getvalue()
 
-        # Button styling
         custom_button = """
         <style>
         div.stDownloadButton > button {
