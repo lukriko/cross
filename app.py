@@ -12,27 +12,6 @@ if password_input != PASSWORD:
     st.warning("🔒 გთხოვთ შეიყვანოთ სწორი პაროლი")
     st.stop()
 
-# --- Dark background CSS ---
-dark_bg = """
-<style>
-    /* Dark page background */
-    .stApp {
-        background-color: #121212;
-        color: #FFFFFF;
-    }
-
-    /* Dark dataframe headers */
-    .css-1lcbmhc.e1fqkh3o2 {
-        background-color: #1E1E1E;
-        color: #FFFFFF;
-    }
-    
-    /* General text */
-    .stTextInput > div > input, .stTextInput > label {
-        color: #FFFFFF;
-    }
-</style>
-"""
 st.markdown(dark_bg, unsafe_allow_html=True)
 
 # Streamlit page config
@@ -177,3 +156,4 @@ if uploaded_file:
         st.error(f"❌ შეცდომა ფაილის დამუშავებისას: {e}")
 else:
     st.info("👆 გთხოვთ ატვირთოთ ფაილი დასათვლელად")
+
