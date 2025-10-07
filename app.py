@@ -4,6 +4,14 @@ import matplotlib.pyplot as plt
 from io import BytesIO
 import seaborn as sns
 
+# --- Password ---
+PASSWORD = "your_password_here"  # change this to your password
+password_input = st.text_input("Enter password:", type="password")
+
+if password_input != PASSWORD:
+    st.warning("🔒 Please enter the correct password to access the app.")
+    st.stop()  # stops execution if password is wrong
+
 # Streamlit page config
 st.set_page_config(page_title="Cross-Selling Analyzer", layout="wide")
 
@@ -66,20 +74,12 @@ if uploaded_file:
         # --- Small, Prettier Bar Chart ---
         top = grouped2.head(10)
 
-        # Use seaborn style for better visuals
-       # Place chart in a smaller column
-        col1, col2 = st.columns([1, 2])  # first column small, second column empty
-
+        col1, col2 = st.columns([1, 2])  # smaller column for chart
         with col1:
-            top = grouped2.head(10)
-            
-            import seaborn as sns
             sns.set_style("whitegrid")
-            
-            fig, ax = plt.subplots(figsize=(7, 5))  # small compact figure
+            fig, ax = plt.subplots(figsize=(3.5, 2))  # small compact figure
             bars = ax.barh(top['თანამშრომელი'], top['პროცენტულობა'], color='#2ca02c')
             
-            # Add values at the end of bars
             for bar in bars:
                 width = bar.get_width()
                 ax.text(width + 1, bar.get_y() + bar.get_height()/2, f'{width}%', va='center', fontsize=7)
@@ -90,9 +90,7 @@ if uploaded_file:
             ax.invert_yaxis()
             ax.grid(True, axis='x', linestyle='--', alpha=0.6)
             plt.tight_layout()
-            
             st.pyplot(fig)
-
 
         # --- Download Button ---
         output = BytesIO()
@@ -111,9 +109,3 @@ if uploaded_file:
         st.error(f"❌ Error processing file: {e}")
 else:
     st.info("👆 Please upload an Excel file to begin.")
-
-
-
-
-
-
