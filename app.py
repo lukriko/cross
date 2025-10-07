@@ -72,31 +72,34 @@ if uploaded_file:
         sns.set_style("whitegrid")
 
         # --- TINY Chart ---
-        fig, ax = plt.subplots(figsize=(3.5, 2.2))  # ✅ much smaller
+        # --- TINY Chart ---
+        fig, ax = plt.subplots(figsize=(5, 3))  # slightly wider
         bars = ax.barh(top['თანამშრომელი'], top['პროცენტულობა'], color='#2ca02c', height=0.5)
+        
         for bar in bars:
             width = bar.get_width()
-            ax.text(width + 0.5, bar.get_y() + bar.get_height()/1.6, f'{width}%', va='center', fontsize=6)
-        ax.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=7)
-        ax.set_ylabel('თანამშრომელი', fontsize=7)
-        ax.tick_params(axis='both', labelsize=6)
+            ax.text(width + 1, bar.get_y() + bar.get_height()/1.6, f'{width}%', va='center', fontsize=8)
+        
+        ax.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=9)
+        ax.set_ylabel('თანამშრომელი', fontsize=9)
+        ax.tick_params(axis='both', labelsize=8)
         ax.invert_yaxis()
         ax.grid(True, axis='x', linestyle='--', alpha=0.4)
-        plt.tight_layout()
-        st.pyplot(fig, use_container_width=False)  # ✅ disables stretch
-
+        plt.tight_layout(rect=[0, 0, 0.95, 1])  # leave space on the right for labels
+        st.pyplot(fig, use_container_width=False)
+        
         # --- Expandable larger chart ---
         with st.expander("🔍 სრულად ნახვა / დახურვა"):
-            fig_big, ax_big = plt.subplots(figsize=(8, 4))  # moderately bigger
+            fig_big, ax_big = plt.subplots(figsize=(10, 5))  # bigger for clarity
             bars_big = ax_big.barh(top['თანამშრომელი'], top['პროცენტულობა'], color='#2ca02c')
             for bar in bars_big:
                 width = bar.get_width()
-                ax_big.text(width + 0.7, bar.get_y() + bar.get_height()/2, f'{width}%', va='center', fontsize=9)
-            ax_big.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=10)
-            ax_big.set_ylabel('თანამშრომელი', fontsize=10)
+                ax_big.text(width + 1, bar.get_y() + bar.get_height()/2, f'{width}%', va='center', fontsize=10)
+            ax_big.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=12)
+            ax_big.set_ylabel('თანამშრომელი', fontsize=12)
             ax_big.invert_yaxis()
             ax_big.grid(True, axis='x', linestyle='--', alpha=0.5)
-            plt.tight_layout()
+            plt.tight_layout(rect=[0, 0, 0.95, 1])  # leave space for labels
             st.pyplot(fig_big, use_container_width=False)
 
         st.markdown("---")
@@ -141,4 +144,5 @@ if uploaded_file:
         st.error(f"❌ შეცდომა ფაილის დამუშავებისას: {e}")
 else:
     st.info("👆 გთხოვთ ატვირთოთ ფაილი დასათვლელად")
+
 
