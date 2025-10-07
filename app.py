@@ -72,7 +72,8 @@ if uploaded_file:
 
         # --- Small, Prettier Bar Chart ---
         top = grouped2
-
+        st.subheader("თანამშრომელი ქროს-სელინგის მიხედვით")
+        st.markdown("---")  # ← 
         col1, col2 = st.columns([1, 2])  # smaller column for chart
         with col1:
             sns.set_style("whitegrid")
@@ -108,6 +109,7 @@ if uploaded_file:
         st.error(f"❌ Error processing file: {e}")
 else:
     st.info("👆 გთხოვთ ატვირტოთ ფაილი დასათვლელად")
+
 
 
 
