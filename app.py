@@ -12,6 +12,29 @@ if password_input != PASSWORD:
     st.warning("🔒 გთხოვთ შეიყვანოთ სწორი პაროლი")
     st.stop()
 
+# --- Dark background CSS ---
+dark_bg = """
+<style>
+    /* Dark page background */
+    .stApp {
+        background-color: #121212;
+        color: #FFFFFF;
+    }
+
+    /* Dark dataframe headers */
+    .css-1lcbmhc.e1fqkh3o2 {
+        background-color: #1E1E1E;
+        color: #FFFFFF;
+    }
+    
+    /* General text */
+    .stTextInput > div > input, .stTextInput > label {
+        color: #FFFFFF;
+    }
+</style>
+"""
+st.markdown(dark_bg, unsafe_allow_html=True)
+
 # Streamlit page config
 st.set_page_config(page_title="ქროს-სელინგის მაჩვენებელი", layout="wide")
 
@@ -24,6 +47,7 @@ if uploaded_file:
     try:
         df_copy = pd.read_excel(uploaded_file, sheet_name='Sheet')
 
+        # Filter data
         unwanted_categories = ['POP', 'COURIER', 'GIFT CARD', 'SERVICE']
         df_filtered = df_copy.copy()
         df_filtered = df_filtered[
@@ -33,6 +57,7 @@ if uploaded_file:
             & (~df_filtered['პროდ. ჯგუფი'].isin(unwanted_categories))
         ].dropna(subset=['თანამშრომელი', 'ზედდებული'])
 
+        # Group calculations
         grouped = (
             df_filtered.groupby(['თანამშრომელი', 'ზედდებული'])
             .size()
@@ -69,36 +94,42 @@ if uploaded_file:
         st.markdown("---")
 
         top = grouped2.head(10)
-        sns.set_style("whitegrid")
+        sns.set_style("darkgrid")  # Seaborn dark style
 
-        # --- Small Dashboard-Style Chart ---
-        fig, ax = plt.subplots(figsize=(3.5, 2.2))  # compact size
+        # --- Small Dashboard Chart ---
+        fig, ax = plt.subplots(figsize=(3.5, 2.2))
         bars = ax.barh(top['თანამშრომელი'], top['პროცენტულობა'], color='#2ca02c', height=0.5)
+
+        # x-axis scaled above max
+        max_val = top['პროცენტულობა'].max()
+        ax.set_xlim(0, max_val + 10)
 
         for bar in bars:
             width = bar.get_width()
-            ax.text(width + 0.5, bar.get_y() + bar.get_height()/1.6, f'{width}%', va='center', fontsize=6)
+            ax.text(width + 0.5, bar.get_y() + bar.get_height()/1.6, f'{width}%', va='center', fontsize=6, color='white')
 
-        ax.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=7)
-        ax.set_ylabel('თანამშრომელი', fontsize=7)
-        ax.tick_params(axis='both', labelsize=6)
+        ax.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=7, color='white')
+        ax.set_ylabel('თანამშრომელი', fontsize=7, color='white')
+        ax.tick_params(axis='both', labelsize=6, colors='white')
         ax.invert_yaxis()
         ax.grid(True, axis='x', linestyle='--', alpha=0.4)
-
-        # Keep figure small but leave space for labels
         plt.tight_layout(rect=[0, 0, 0.95, 1])
-
         st.pyplot(fig, use_container_width=False)
 
         # --- Expandable Larger Chart ---
         with st.expander("🔍 სრულად ნახვა / დახურვა"):
-            fig_big, ax_big = plt.subplots(figsize=(8, 4))  # larger for clarity
+            fig_big, ax_big = plt.subplots(figsize=(8, 4))
             bars_big = ax_big.barh(top['თანამშრომელი'], top['პროცენტულობა'], color='#2ca02c')
+
+            max_val_big = top['პროცენტულობა'].max()
+            ax_big.set_xlim(0, max_val_big + 10)
+
             for bar in bars_big:
                 width = bar.get_width()
-                ax_big.text(width + 0.7, bar.get_y() + bar.get_height()/2, f'{width}%', va='center', fontsize=9)
-            ax_big.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=10)
-            ax_big.set_ylabel('თანამშრომელი', fontsize=10)
+                ax_big.text(width + 0.7, bar.get_y() + bar.get_height()/2, f'{width}%', va='center', fontsize=9, color='white')
+
+            ax_big.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=10, color='white')
+            ax_big.set_ylabel('თანამშრომელი', fontsize=10, color='white')
             ax_big.invert_yaxis()
             ax_big.grid(True, axis='x', linestyle='--', alpha=0.5)
             plt.tight_layout(rect=[0, 0, 0.95, 1])
@@ -112,11 +143,12 @@ if uploaded_file:
             grouped2.to_excel(writer, index=False, sheet_name='CrossSellingResults')
         excel_data = output.getvalue()
 
+        # Custom button styling
         custom_button = """
         <style>
         div.stDownloadButton > button {
-            background-color: white;
-            color: black;
+            background-color: #1E1E1E;
+            color: #FFFFFF;
             font-size: 18px;
             font-weight: 600;
             border-radius: 10px;
@@ -126,8 +158,8 @@ if uploaded_file:
             width: 100%;
         }
         div.stDownloadButton > button:hover {
-            background-color: #e6ffe6;
-            color: #1a1a1a;
+            background-color: #2ca02c;
+            color: black;
             border-color: #1e8f1e;
         }
         </style>
