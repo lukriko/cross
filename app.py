@@ -82,7 +82,7 @@ if uploaded_file:
             
             for bar in bars:
                 width = bar.get_width()
-                ax.text(width + 1, bar.get_y() + bar.get_height()/1.56, f'{width}%', va='center', fontsize=7)
+                ax.text(width + 1, bar.get_y() + bar.get_height()/1.56, f'{width}%', va='center', fontsize=10)
             
             ax.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=10)
             ax.set_ylabel('თანამშრომელი', fontsize=10)
@@ -109,6 +109,7 @@ if uploaded_file:
         st.error(f"❌ Error processing file: {e}")
 else:
     st.info("👆 Please upload an Excel file to begin.")
+
 
 
 
