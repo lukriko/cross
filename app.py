@@ -72,7 +72,7 @@ if uploaded_file:
         st.dataframe(grouped2.head(10))
 
         # --- Small, Prettier Bar Chart ---
-        top = grouped2.head(10)
+        top = grouped2
 
         col1, col2 = st.columns([1, 2])  # smaller column for chart
         with col1:
@@ -84,9 +84,9 @@ if uploaded_file:
                 width = bar.get_width()
                 ax.text(width + 1, bar.get_y() + bar.get_height()/1.56, f'{width}%', va='center', fontsize=10)
             
-            ax.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=10)
-            ax.set_ylabel('თანამშრომელი', fontsize=10)
-            ax.set_title('თანამშრომელი', fontsize=12)
+            ax.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=12)
+            ax.set_ylabel('თანამშრომელი', fontsize=12)
+            # ax.set_title('თანამშრომ', fontsize=14)
             ax.invert_yaxis()
             ax.grid(True, axis='x', linestyle='--', alpha=0.6)
             plt.tight_layout()
@@ -109,6 +109,7 @@ if uploaded_file:
         st.error(f"❌ Error processing file: {e}")
 else:
     st.info("👆 Please upload an Excel file to begin.")
+
 
 
 
