@@ -77,7 +77,7 @@ if uploaded_file:
         col1, col2 = st.columns([1, 2])  # smaller column for chart
         with col1:
             sns.set_style("whitegrid")
-            fig, ax = plt.subplots(figsize=(3.5, 2))  # small compact figure
+            fig, ax = plt.subplots(figsize=(5, 3))  # small compact figure
             bars = ax.barh(top['თანამშრომელი'], top['პროცენტულობა'], color='#2ca02c')
             
             for bar in bars:
@@ -109,4 +109,5 @@ if uploaded_file:
         st.error(f"❌ Error processing file: {e}")
 else:
     st.info("👆 Please upload an Excel file to begin.")
+
 
