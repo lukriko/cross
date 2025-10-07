@@ -101,23 +101,25 @@ if uploaded_file:
             grouped2.to_excel(writer, index=False, sheet_name='CrossSellingResults')
         excel_data = output.getvalue()
 
-        # --- Beautiful Download Button ---
+# --- Elegant Download Button Styling ---
         custom_button = """
         <style>
         div.stDownloadButton > button {
-            background-color: #2ca02c;
-            color: white;
+            background-color: white;
+            color: black;
             font-size: 18px;
-            font-weight: bold;
+            font-weight: 600;
             border-radius: 10px;
-            border: none;
+            border: 2px solid #2ca02c;
             padding: 12px 24px;
-            transition: 0.3s;
+            transition: all 0.3s ease;
             width: 100%;
         }
         div.stDownloadButton > button:hover {
-            background-color: #238b23;
-            transform: scale(1.03);
+            background-color: #e6ffe6; /* soft green background */
+            color: #1a1a1a; /* darker text */
+            border-color: #1e8f1e; /* slightly darker green border */
+            transform: scale(1.02);
         }
         </style>
         """
@@ -134,6 +136,7 @@ if uploaded_file:
         st.error(f"❌ Error processing file: {e}")
 else:
     st.info("👆 გთხოვთ ატვირტოთ ფაილი დასათვლელად")
+
 
 
 
