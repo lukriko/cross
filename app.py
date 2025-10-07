@@ -76,7 +76,7 @@ if uploaded_file:
             import seaborn as sns
             sns.set_style("whitegrid")
             
-            fig, ax = plt.subplots(figsize=(6, 3))  # small compact figure
+            fig, ax = plt.subplots(figsize=(8, 6))  # small compact figure
             bars = ax.barh(top['თანამშრომელი'], top['პროცენტულობა'], color='#2ca02c')
             
             # Add values at the end of bars
@@ -111,6 +111,7 @@ if uploaded_file:
         st.error(f"❌ Error processing file: {e}")
 else:
     st.info("👆 Please upload an Excel file to begin.")
+
 
 
 
