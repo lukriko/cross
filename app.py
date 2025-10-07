@@ -62,7 +62,7 @@ if uploaded_file:
         st.dataframe(grouped2.head(10))
 
         # --- Bar Chart ---
-        fig, ax = plt.subplots(figsize=(10, 5))
+        fig, ax = plt.subplots(figsize=(8, 5))
         top = grouped2.head(10)
         ax.barh(top['თანამშრომელი'], top['პროცენტულობა'], color='seagreen')
         ax.set_xlabel('% კალათები 3+ პროდუქტით')
@@ -89,3 +89,4 @@ if uploaded_file:
         st.error(f"❌ Error processing file: {e}")
 else:
     st.info("👆 Please upload an Excel file to begin.")
+
