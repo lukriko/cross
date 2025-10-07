@@ -77,16 +77,16 @@ if uploaded_file:
         col1, col2 = st.columns([1, 2])  # smaller column for chart
         with col1:
             sns.set_style("whitegrid")
-            fig, ax = plt.subplots(figsize=(6, 4))  # small compact figure
+            fig, ax = plt.subplots(figsize=(7, 5))  # small compact figure
             bars = ax.barh(top['თანამშრომელი'], top['პროცენტულობა'], color='#2ca02c')
             
             for bar in bars:
                 width = bar.get_width()
                 ax.text(width + 1, bar.get_y() + bar.get_height()/2, f'{width}%', va='center', fontsize=7)
             
-            ax.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=9)
-            ax.set_ylabel('თანამშრომელი', fontsize=9)
-            ax.set_title('Top 10 თანამშრომელი', fontsize=10)
+            ax.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=10)
+            ax.set_ylabel('თანამშრომელი', fontsize=10)
+            ax.set_title('Top 10 თანამშრომელი', fontsize=12)
             ax.invert_yaxis()
             ax.grid(True, axis='x', linestyle='--', alpha=0.6)
             plt.tight_layout()
@@ -109,6 +109,7 @@ if uploaded_file:
         st.error(f"❌ Error processing file: {e}")
 else:
     st.info("👆 Please upload an Excel file to begin.")
+
 
 
 
