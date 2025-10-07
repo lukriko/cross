@@ -67,22 +67,32 @@ if uploaded_file:
         top = grouped2.head(10)
 
         # Use seaborn style for better visuals
-        sns.set_style("whitegrid")
-        fig, ax = plt.subplots(figsize=(5, 3))  # small figure
-        bars = ax.barh(top['თანამშრომელი'], top['პროცენტულობა'], color='#2ca02c')  # prettier green
+       # Place chart in a smaller column
+        col1, col2 = st.columns([1, 2])  # first column small, second column empty
 
-        # Add value labels on bars
-        for bar in bars:
-            width = bar.get_width()
-            ax.text(width + 0.5, bar.get_y() + bar.get_height()/2, f'{width}%', va='center', fontsize=8)
+        with col1:
+            top = grouped2.head(10)
+            
+            import seaborn as sns
+            sns.set_style("whitegrid")
+            
+            fig, ax = plt.subplots(figsize=(3.5, 2))  # small compact figure
+            bars = ax.barh(top['თანამშრომელი'], top['პროცენტულობა'], color='#2ca02c')
+            
+            # Add values at the end of bars
+            for bar in bars:
+                width = bar.get_width()
+                ax.text(width + 0.5, bar.get_y() + bar.get_height()/2, f'{width}%', va='center', fontsize=7)
+            
+            ax.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=8)
+            ax.set_ylabel('თანამშრომელი', fontsize=8)
+            ax.set_title('Top 10 თანამშრომელი', fontsize=9)
+            ax.invert_yaxis()
+            ax.grid(True, axis='x', linestyle='--', alpha=0.6)
+            plt.tight_layout()
+            
+            st.pyplot(fig)
 
-        ax.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=9)
-        ax.set_ylabel('თანამშრომელი', fontsize=9)
-        ax.set_title('Top 10 თანამშრომელი by Cross-Selling Rate', fontsize=10)
-        ax.invert_yaxis()
-        ax.grid(True, axis='x', linestyle='--', alpha=0.6)
-        plt.tight_layout()
-        st.pyplot(fig)
 
         # --- Download Button ---
         output = BytesIO()
@@ -101,3 +111,4 @@ if uploaded_file:
         st.error(f"❌ Error processing file: {e}")
 else:
     st.info("👆 Please upload an Excel file to begin.")
+
