@@ -101,8 +101,30 @@ if uploaded_file:
             grouped2.to_excel(writer, index=False, sheet_name='CrossSellingResults')
         excel_data = output.getvalue()
 
+        # --- Beautiful Download Button ---
+        custom_button = """
+        <style>
+        div.stDownloadButton > button {
+            background-color: #2ca02c;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            border: none;
+            padding: 12px 24px;
+            transition: 0.3s;
+            width: 100%;
+        }
+        div.stDownloadButton > button:hover {
+            background-color: #238b23;
+            transform: scale(1.03);
+        }
+        </style>
+        """
+        st.markdown(custom_button, unsafe_allow_html=True)
+        
         st.download_button(
-            label="📥 გადმოწერა ექსელის ფორმატში",
+            label="📥 გადმოწერა Excel ფორმატში",
             data=excel_data,
             file_name="ქროს-სელინგი.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -112,6 +134,7 @@ if uploaded_file:
         st.error(f"❌ Error processing file: {e}")
 else:
     st.info("👆 გთხოვთ ატვირტოთ ფაილი დასათვლელად")
+
 
 
 
