@@ -12,8 +12,6 @@ if password_input != PASSWORD:
     st.warning("🔒 გთხოვთ შეიყვანოთ სწორი პაროლი")
     st.stop()
 
-st.markdown(dark_bg, unsafe_allow_html=True)
-
 # Streamlit page config
 st.set_page_config(page_title="ქროს-სელინგის მაჩვენებელი", layout="wide")
 
@@ -73,7 +71,7 @@ if uploaded_file:
         st.markdown("---")
 
         top = grouped2.head(10)
-        sns.set_style("darkgrid")  # Seaborn dark style
+        sns.set_style("whitegrid")  # light background
 
         # --- Small Dashboard Chart ---
         fig, ax = plt.subplots(figsize=(3.5, 2.2))
@@ -85,11 +83,11 @@ if uploaded_file:
 
         for bar in bars:
             width = bar.get_width()
-            ax.text(width + 0.5, bar.get_y() + bar.get_height()/1.6, f'{width}%', va='center', fontsize=6, color='white')
+            ax.text(width + 0.5, bar.get_y() + bar.get_height()/1.6, f'{width}%', va='center', fontsize=6)
 
-        ax.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=7, color='white')
-        ax.set_ylabel('თანამშრომელი', fontsize=7, color='white')
-        ax.tick_params(axis='both', labelsize=6, colors='white')
+        ax.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=7)
+        ax.set_ylabel('თანამშრომელი', fontsize=7)
+        ax.tick_params(axis='both', labelsize=6)
         ax.invert_yaxis()
         ax.grid(True, axis='x', linestyle='--', alpha=0.4)
         plt.tight_layout(rect=[0, 0, 0.95, 1])
@@ -105,10 +103,10 @@ if uploaded_file:
 
             for bar in bars_big:
                 width = bar.get_width()
-                ax_big.text(width + 0.7, bar.get_y() + bar.get_height()/2, f'{width}%', va='center', fontsize=9, color='white')
+                ax_big.text(width + 0.7, bar.get_y() + bar.get_height()/2, f'{width}%', va='center', fontsize=9)
 
-            ax_big.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=10, color='white')
-            ax_big.set_ylabel('თანამშრომელი', fontsize=10, color='white')
+            ax_big.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=10)
+            ax_big.set_ylabel('თანამშრომელი', fontsize=10)
             ax_big.invert_yaxis()
             ax_big.grid(True, axis='x', linestyle='--', alpha=0.5)
             plt.tight_layout(rect=[0, 0, 0.95, 1])
@@ -126,8 +124,8 @@ if uploaded_file:
         custom_button = """
         <style>
         div.stDownloadButton > button {
-            background-color: #1E1E1E;
-            color: #FFFFFF;
+            background-color: white;
+            color: black;
             font-size: 18px;
             font-weight: 600;
             border-radius: 10px;
@@ -137,8 +135,8 @@ if uploaded_file:
             width: 100%;
         }
         div.stDownloadButton > button:hover {
-            background-color: #2ca02c;
-            color: black;
+            background-color: #e6ffe6;
+            color: #1a1a1a;
             border-color: #1e8f1e;
         }
         </style>
@@ -156,4 +154,3 @@ if uploaded_file:
         st.error(f"❌ შეცდომა ფაილის დამუშავებისას: {e}")
 else:
     st.info("👆 გთხოვთ ატვირთოთ ფაილი დასათვლელად")
-
