@@ -2,7 +2,9 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 from io import BytesIO
+import seaborn as sns
 
+# Streamlit page config
 st.set_page_config(page_title="Cross-Selling Analyzer", layout="wide")
 
 st.title("🛒 Cross-Selling Analyzer")
@@ -61,18 +63,26 @@ if uploaded_file:
         st.subheader("Top 10 თანამშრომელი by Cross-Selling Rate")
         st.dataframe(grouped2.head(10))
 
-        # --- Bar Chart ---
-        fig, ax = plt.subplots(figsize=(4, 2))  # smaller figure
+        # --- Small, Prettier Bar Chart ---
         top = grouped2.head(10)
-        ax.barh(top['თანამშრომელი'], top['პროცენტულობა'], color='seagreen', fontsize=4)
-        ax.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=4)
-        ax.set_ylabel('თანამშრომელი', fontsize=4)
-        ax.set_title('Top 10 თანამშრომელი by Cross-Selling Rate', fontsize=6)
+
+        # Use seaborn style for better visuals
+        sns.set_style("whitegrid")
+        fig, ax = plt.subplots(figsize=(5, 3))  # small figure
+        bars = ax.barh(top['თანამშრომელი'], top['პროცენტულობა'], color='#2ca02c')  # prettier green
+
+        # Add value labels on bars
+        for bar in bars:
+            width = bar.get_width()
+            ax.text(width + 0.5, bar.get_y() + bar.get_height()/2, f'{width}%', va='center', fontsize=8)
+
+        ax.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=9)
+        ax.set_ylabel('თანამშრომელი', fontsize=9)
+        ax.set_title('Top 10 თანამშრომელი by Cross-Selling Rate', fontsize=10)
         ax.invert_yaxis()
         ax.grid(True, axis='x', linestyle='--', alpha=0.6)
-        plt.tight_layout() 
+        plt.tight_layout()
         st.pyplot(fig)
-
 
         # --- Download Button ---
         output = BytesIO()
@@ -91,10 +101,3 @@ if uploaded_file:
         st.error(f"❌ Error processing file: {e}")
 else:
     st.info("👆 Please upload an Excel file to begin.")
-
-
-
-
-
-
-
