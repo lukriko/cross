@@ -62,15 +62,16 @@ if uploaded_file:
         st.dataframe(grouped2.head(10))
 
         # --- Bar Chart ---
-        fig, ax = plt.subplots(figsize=(6, 3))
+        fig, ax = plt.subplots(figsize=(4, 2))  # smaller figure
         top = grouped2.head(10)
         ax.barh(top['თანამშრომელი'], top['პროცენტულობა'], color='seagreen')
         ax.set_xlabel('% კალათები 3+ პროდუქტით')
         ax.set_ylabel('თანამშრომელი')
-        ax.set_title('Top 10 თანამშრომელი by Cross-Selling Rate')
+        ax.set_title('თანამშრომელი by Cross-Selling Rate')
         ax.invert_yaxis()
         ax.grid(True, axis='x', linestyle='--', alpha=0.6)
         st.pyplot(fig)
+
 
         # --- Download Button ---
         output = BytesIO()
@@ -89,5 +90,6 @@ if uploaded_file:
         st.error(f"❌ Error processing file: {e}")
 else:
     st.info("👆 Please upload an Excel file to begin.")
+
 
 
