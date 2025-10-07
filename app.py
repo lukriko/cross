@@ -59,8 +59,9 @@ if uploaded_file:
         grouped2 = grouped2.sort_values(by='პროცენტულობა', ascending=False)
 
         st.success("✅ მონაცემები აიტვირთა წარმატებით!")
-
+        st.markdown("---")
         st.subheader("თანამშრომლები ქროს-სელინგის მაჩვენებლით")
+        st.markdown("---")
         st.dataframe(grouped2.head(10))
 
         st.markdown("---")
@@ -140,3 +141,4 @@ if uploaded_file:
         st.error(f"❌ შეცდომა ფაილის დამუშავებისას: {e}")
 else:
     st.info("👆 გთხოვთ ატვირთოთ ფაილი დასათვლელად")
+
