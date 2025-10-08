@@ -5,7 +5,7 @@ from io import BytesIO
 import seaborn as sns
 
 # --- Password ---
-PASSWORD = "123"
+PASSWORD = "1234"
 password_input = st.text_input("პაროლი:", type="password")
 
 if password_input != PASSWORD:
@@ -154,3 +154,4 @@ if uploaded_file:
         st.error(f"❌ შეცდომა ფაილის დამუშავებისას: {e}")
 else:
     st.info("👆 გთხოვთ ატვირთოთ ფაილი დასათვლელად")
+
