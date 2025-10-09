@@ -3,6 +3,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from io import BytesIO
 import seaborn as sns
+import datetime
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
 scope = ["https://spreadsheets.google.com/feeds",'https://www.googleapis.com/auth/drive']
 creds = ServiceAccountCredentials.from_json_keyfile_name("cohesive-amp-474615-n6-9d6de1e38058.json", scope)
@@ -200,6 +203,7 @@ if uploaded_file:
         st.error(f"❌ შეცდომა ფაილის დამუშავებისას: {e}")
 else:
     st.info("👆 გთხოვთ ატვირთოთ ფაილი დასათვლელად")
+
 
 
 
