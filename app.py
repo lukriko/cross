@@ -4,22 +4,12 @@ import matplotlib.pyplot as plt
 from io import BytesIO
 import seaborn as sns
 
-COUNTER_FILE = "usage_count.txt"
+scope = ["https://spreadsheets.google.com/feeds",'https://www.googleapis.com/auth/drive']
+creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+client = gspread.authorize(creds)
+sheet = client.open("Streamlit Usage Log").sheet1  # Sheet1
 
-def increment_usage():
-    count = 0
-    if os.path.exists(COUNTER_FILE):
-        with open(COUNTER_FILE, "r") as f:
-            try:
-                count = int(f.read().strip())
-            except:
-                count = 0
-    count += 1
-    with open(COUNTER_FILE, "w") as f:
-        f.write(str(count))
-    return count
-
-# --- Password ---
+# --- Password check ---
 PASSWORD = "1234"
 password_input = st.text_input("პაროლი:", type="password")
 
@@ -27,9 +17,9 @@ if password_input != PASSWORD:
     st.warning("🔒 გთხოვთ შეიყვანოთ სწორი პაროლი")
     st.stop()
 else:
-    # Increment usage only after correct password
-    usage_count = increment_usage()
-
+    # Log usage immediately after correct password
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    sheet.append_row([timestamp])
 # --- Streamlit page config ---
 st.set_page_config(page_title="ქროს-სელინგის მაჩვენებელი", layout="wide")
 
@@ -210,5 +200,6 @@ if uploaded_file:
         st.error(f"❌ შეცდომა ფაილის დამუშავებისას: {e}")
 else:
     st.info("👆 გთხოვთ ატვირთოთ ფაილი დასათვლელად")
+
 
 
