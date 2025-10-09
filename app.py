@@ -3,29 +3,16 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from io import BytesIO
 import seaborn as sns
-import datetime
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
 
-# scope = ["https://spreadsheets.google.com/feeds",'https://www.googleapis.com/auth/drive']
-# creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
-# client = gspread.authorize(creds)
+# --- Password ---
+PASSWORD = "1234"
+password_input = st.text_input("პაროლი:", type="password")
 
-# # Use spreadsheet key instead of title
-# sheet = client.open_by_key("1KlzL_4aa5IFdgS68Lg-7JI8jCWyafvTA9YnRRvrn0vM").sheet1
+if password_input != PASSWORD:
+    st.warning("🔒 გთხოვთ შეიყვანოთ სწორი პაროლი")
+    st.stop()
 
-# Password
-# PASSWORD = "1234"
-# password_input = st.text_input("პაროლი:", type="password")
-
-# if password_input != PASSWORD:
-#     st.warning("🔒 გთხოვთ შეიყვანოთ სწორი პაროლი")
-#     st.stop()
-# else:
-#     # Log usage after correct password
-#     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-#     sheet.append_row([timestamp])
-# # --- Streamlit page config ---
+# Streamlit page config
 st.set_page_config(page_title="ქროს-სელინგის მაჩვენებელი", layout="wide")
 
 st.title("🛒 ქროს-სელინგის პროცენტული მაჩვენებელი")
@@ -107,11 +94,9 @@ if uploaded_file:
             bars_big = ax_big.barh(top['თანამშრომელი'], top['პროცენტულობა'], color='#2ca02c')
             max_val_big = top['პროცენტულობა'].max()
             ax_big.set_xlim(0, max_val_big + 10)
-
             for bar in bars_big:
                 width = bar.get_width()
                 ax_big.text(width + 0.7, bar.get_y() + bar.get_height()/2, f'{width}%', va='center', fontsize=9)
-
             ax_big.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=10)
             ax_big.set_ylabel('თანამშრომელი', fontsize=10)
             ax_big.invert_yaxis()
@@ -123,10 +108,10 @@ if uploaded_file:
         st.markdown("---")
         st.subheader("💆‍♀️ სქინქეარის გაყიდვების წილი")
 
-        df_skin = df_copy.copy()  # base: full data copy
+        df_skin = df_copy.copy()
         df_skin = df_skin[
             (df_skin['თანხა'] != 0)
-            & (~df_skin['პროდ. ჯგუფი'].isin(['SERVICE', 'GIFT CARD']))  # note: POP not excluded here
+            & (~df_skin['პროდ. ჯგუფი'].isin(['SERVICE', 'GIFT CARD']))
         ]
 
         df_skincare = df_skin[df_skin['პროდ. ჯგუფი'] == 'SKIN CARE']
@@ -141,7 +126,6 @@ if uploaded_file:
             (combined['სქინქეარის გაყიდვები'] / combined['სრული გაყიდვები']) * 100, 1
         )
         combined = combined.sort_values(by='პროცენტული მაჩვენებელი', ascending=False)
-
         st.dataframe(combined.head(10))
 
         # --- SKIN CARE Chart ---
@@ -205,11 +189,3 @@ if uploaded_file:
         st.error(f"❌ შეცდომა ფაილის დამუშავებისას: {e}")
 else:
     st.info("👆 გთხოვთ ატვირთოთ ფაილი დასათვლელად")
-
-
-
-
-
-
-
-
