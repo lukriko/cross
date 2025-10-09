@@ -10,7 +10,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 scope = ["https://spreadsheets.google.com/feeds",'https://www.googleapis.com/auth/drive']
 creds = ServiceAccountCredentials.from_json_keyfile_name("cohesive-amp-474615-n6-9d6de1e38058.json", scope)
 client = gspread.authorize(creds)
-sheet = client.open("Streamlit Usage Log").sheet1  # Sheet1
+sheet = client.open("crs").sheet1  # Sheet1
 
 # --- Password check ---
 PASSWORD = "1234"
@@ -203,6 +203,7 @@ if uploaded_file:
         st.error(f"❌ შეცდომა ფაილის დამუშავებისას: {e}")
 else:
     st.info("👆 გთხოვთ ატვირთოთ ფაილი დასათვლელად")
+
 
 
 
