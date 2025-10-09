@@ -3,6 +3,23 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from io import BytesIO
 import seaborn as sns
+COUNTER_FILE = "usage_count.txt"
+
+def increment_usage():
+    count = 0
+    if os.path.exists(COUNTER_FILE):
+        with open(COUNTER_FILE, "r") as f:
+            try:
+                count = int(f.read().strip())
+            except:
+                count = 0
+    count += 1
+    with open(COUNTER_FILE, "w") as f:
+        f.write(str(count))
+    return count
+
+# Increment every time app loads
+usage_count = increment_usage()
 
 # --- Password ---
 PASSWORD = "1234"
@@ -192,3 +209,4 @@ if uploaded_file:
         st.error(f"❌ შეცდომა ფაილის დამუშავებისას: {e}")
 else:
     st.info("👆 გთხოვთ ატვირთოთ ფაილი დასათვლელად")
+
