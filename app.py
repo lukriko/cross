@@ -7,12 +7,12 @@ import datetime
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
-scope = ["https://spreadsheets.google.com/feeds",'https://www.googleapis.com/auth/drive']
-creds = ServiceAccountCredentials.from_json_keyfile_name("cohesive-amp-474615-n6-9d6de1e38058.json", scope)
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
 client = gspread.authorize(creds)
-sheet = client.open("crs").sheet1  # Sheet1
+sheet = client.open_by_key("1KlzL_4aa5IFdgS68Lg-7JI8jCWyafvTA9YnRRvrn0vM").sheet1
 
-# --- Password check ---
+# Password check
 PASSWORD = "1234"
 password_input = st.text_input("პაროლი:", type="password")
 
@@ -203,6 +203,7 @@ if uploaded_file:
         st.error(f"❌ შეცდომა ფაილის დამუშავებისას: {e}")
 else:
     st.info("👆 გთხოვთ ატვირთოთ ფაილი დასათვლელად")
+
 
 
 
