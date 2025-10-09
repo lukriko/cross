@@ -24,14 +24,14 @@ if uploaded_file:
     try:
         df_copy = pd.read_excel(uploaded_file, sheet_name='Sheet')
 
-        # --- Filter data ---
-        unwanted_categories = ['POP', 'COURIER', 'GIFT CARD', 'SERVICE']
+        # --- Filter data for cross-selling ---
+        unwanted_categories_cross = ['POP', 'COURIER', 'GIFT CARD', 'SERVICE']
         df = df_copy.copy()
         df = df[
             (df['თანხა'] != 0)
             & (df['ფასი'] != 0)
             & (df['ფასი 1'] != 0)
-            & (~df['პროდ. ჯგუფი'].isin(unwanted_categories))
+            & (~df['პროდ. ჯგუფი'].isin(unwanted_categories_cross))
         ].dropna(subset=['თანამშრომელი', 'ზედდებული'])
 
         # --- Cross-selling calculations ---
@@ -106,12 +106,18 @@ if uploaded_file:
             plt.tight_layout(rect=[0, 0, 0.95, 1])
             st.pyplot(fig_big, use_container_width=False)
 
-        # --- SKIN CARE Share ---
+        # --- SKIN CARE Share (POP NOT EXCLUDED) ---
         st.markdown("---")
         st.subheader("💆‍♀️ სქინქეარის გაყიდვების წილი")
 
-        df_skincare = df[df['პროდ. ჯგუფი'] == 'SKIN CARE']
-        df_full = df.copy()
+        df_skin = df_copy.copy()  # base: full data copy
+        df_skin = df_skin[
+            (df_skin['თანხა'] != 0)
+            & (~df_skin['პროდ. ჯგუფი'].isin(['SERVICE', 'GIFT CARD']))  # note: POP not excluded here
+        ]
+
+        df_skincare = df_skin[df_skin['პროდ. ჯგუფი'] == 'SKIN CARE']
+        df_full = df_skin.copy()
 
         grouped_skincare = df_skincare.groupby(['თანამშრომელი']).agg({'თანხა': 'sum'}).reset_index()
         grouped_full = df_full.groupby(['თანამშრომელი']).agg({'თანხა': 'sum'}).reset_index()
@@ -149,8 +155,8 @@ if uploaded_file:
         # --- Download Excel (both datasets) ---
         output = BytesIO()
         with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-            grouped2.to_excel(writer, index=False, sheet_name='CrossSellingResults')
-            combined.to_excel(writer, index=False, sheet_name='SkinCareShare')
+            grouped2.to_excel(writer, index=False, sheet_name='ქროს-სელინგი')
+            combined.to_excel(writer, index=False, sheet_name='სქინქეარი')
         excel_data = output.getvalue()
 
         custom_button = """
