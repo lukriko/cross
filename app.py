@@ -7,12 +7,14 @@ import datetime
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
-scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+scope = ["https://spreadsheets.google.com/feeds",'https://www.googleapis.com/auth/drive']
 creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
 client = gspread.authorize(creds)
+
+# Use spreadsheet key instead of title
 sheet = client.open_by_key("1KlzL_4aa5IFdgS68Lg-7JI8jCWyafvTA9YnRRvrn0vM").sheet1
 
-# Password check
+# Password
 PASSWORD = "1234"
 password_input = st.text_input("პაროლი:", type="password")
 
@@ -20,7 +22,7 @@ if password_input != PASSWORD:
     st.warning("🔒 გთხოვთ შეიყვანოთ სწორი პაროლი")
     st.stop()
 else:
-    # Log usage immediately after correct password
+    # Log usage after correct password
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     sheet.append_row([timestamp])
 # --- Streamlit page config ---
@@ -203,6 +205,7 @@ if uploaded_file:
         st.error(f"❌ შეცდომა ფაილის დამუშავებისას: {e}")
 else:
     st.info("👆 გთხოვთ ატვირთოთ ფაილი დასათვლელად")
+
 
 
 
