@@ -5,7 +5,7 @@ from io import BytesIO
 import seaborn as sns
 
 scope = ["https://spreadsheets.google.com/feeds",'https://www.googleapis.com/auth/drive']
-creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+creds = ServiceAccountCredentials.from_json_keyfile_name("cohesive-amp-474615-n6-9d6de1e38058.json", scope)
 client = gspread.authorize(creds)
 sheet = client.open("Streamlit Usage Log").sheet1  # Sheet1
 
@@ -200,6 +200,7 @@ if uploaded_file:
         st.error(f"❌ შეცდომა ფაილის დამუშავებისას: {e}")
 else:
     st.info("👆 გთხოვთ ატვირთოთ ფაილი დასათვლელად")
+
 
 
 
