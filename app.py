@@ -15,7 +15,7 @@ if password_input != PASSWORD:
 # Streamlit page config
 st.set_page_config(page_title="ქროს-სელინგის მაჩვენებელი", layout="wide")
 
-st.title("🛒 ქროს-სელინგის პროცენტული მაჩვენებელი")
+st.title("🛒 ქროს-სელინგისა და სქინქეარის პროცენტული მაჩვენებელი")
 st.write("ატვირთეთ ობიექტის რეალიზაცია (Excel ფორმატში)")
 
 uploaded_file = st.file_uploader("ატვირთვა", type=["xls", "xlsx"])
@@ -189,3 +189,4 @@ if uploaded_file:
         st.error(f"❌ შეცდომა ფაილის დამუშავებისას: {e}")
 else:
     st.info("👆 გთხოვთ ატვირთოთ ფაილი დასათვლელად")
+
