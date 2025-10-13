@@ -22,7 +22,12 @@ uploaded_file = st.file_uploader("ატვირთვა", type=["xls", "xlsx"
 
 if uploaded_file:
     try:
-        df_copy = pd.read_excel(uploaded_file, sheet_name='Sheet')
+        # --- Determine engine based on file extension ---
+        file_extension = uploaded_file.name.split('.')[-1]
+        if file_extension == 'xls':
+            df_copy = pd.read_excel(uploaded_file, sheet_name='Sheet', engine='xlrd')
+        else:  # xlsx
+            df_copy = pd.read_excel(uploaded_file, sheet_name='Sheet', engine='openpyxl')
 
         # --- Filter data for cross-selling ---
         unwanted_categories_cross = ['POP', 'COURIER', 'GIFT CARD', 'SERVICE']
@@ -67,7 +72,7 @@ if uploaded_file:
 
         # --- Cross-selling Chart ---
         st.markdown("---")
-        st.subheader("ქროს-სელინგის გრაფიკი")
+        st.subheader("ქროს-სელინგის გრაფიკ")
 
         top = grouped2.head(10)
         sns.set_style("whitegrid")
@@ -89,6 +94,7 @@ if uploaded_file:
         plt.tight_layout(rect=[0, 0, 0.95, 1])
         st.pyplot(fig, use_container_width=False)
 
+        # --- Expanded chart ---
         with st.expander("🔍 სრულად ნახვა / დახურვა"):
             fig_big, ax_big = plt.subplots(figsize=(8, 4))
             bars_big = ax_big.barh(top['თანამშრომელი'], top['პროცენტულობა'], color='#2ca02c')
@@ -189,4 +195,3 @@ if uploaded_file:
         st.error(f"❌ შეცდომა ფაილის დამუშავებისას: {e}")
 else:
     st.info("👆 გთხოვთ ატვირთოთ ფაილი დასათვლელად")
-
