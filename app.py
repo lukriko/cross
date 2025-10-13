@@ -30,7 +30,7 @@ if uploaded_file:
             df_copy = pd.read_excel(uploaded_file, sheet_name='Sheet', engine='openpyxl')
 
         # --- Filter data for cross-selling ---
-        unwanted_categories_cross = ['POP', 'COURIER', 'GIFT CARD', 'SERVICE']
+        unwanted_categories_cross = ['POP', 'COURIER', 'GIFT CARD', 'SERVICE','VISAGE','UNIFORM','FURNITURE','-']
         df = df_copy.copy()
         df = df[
             (df['თანხა'] != 0)
@@ -195,4 +195,5 @@ if uploaded_file:
         st.error(f"❌ შეცდომა ფაილის დამუშავებისას: {e}")
 else:
     st.info("👆 გთხოვთ ატვირთოთ ფაილი დასათვლელად")
+
 
