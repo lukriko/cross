@@ -69,9 +69,9 @@ if uploaded_file:
         grouped2 = grouped2.sort_values(by='პროცენტულობა', ascending=False)
 
         # ⭐ NEW TOTALS SECTION (GLOBAL CROSS-SELLING %)
-        total_cross = grouped['2_ზე_მეტი_მოცემულ_კალათაში'].sum()
+        total_cross = grouped['2_ზე_მეტი_მოცემულ_კალათაში'].mean()
         total_baskets = grouped.shape[0]
-        cross_total_pct = round((total_cross / total_baskets) * 100, 2)
+        cross_total_pct = round(total_cross * 100, 2)
 
         st.markdown("---")
         st.markdown("### 📊 საერთო მაჩვენებლები (ყველა ობიექტი ერთად)")
@@ -229,5 +229,6 @@ if uploaded_file:
 
 else:
     st.info("👆 გთხოვთ ატვირთოთ ფაილი დასათვლელად")
+
 
 
