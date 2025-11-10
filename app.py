@@ -86,31 +86,72 @@ if uploaded_file:
         cross_total_pct = round((total_big_baskets / total_baskets) * 100, 2)
 
         # ============================================================
-        # 💆‍♀️ SKINCARE SHARE (EMPLOYEE LEVEL + TOTAL)
+        # 💆‍♀️ SKINCARE SHARE (EMPLOYEE LEVEL + TOTAL) — FIXED
         # ============================================================
+        # 1) Filter once (exclude SERVICE / GIFT CARD), keep everything else identical
         df_skin = df_copy.copy()
         df_skin = df_skin[
             (df_skin['თანხა'] != 0)
             & (~df_skin['პროდ. ჯგუფი'].isin(['SERVICE', 'GIFT CARD']))
         ]
-
+        
+        # 2) Separate skincare vs all (after the same filter)
         df_skincare = df_skin[df_skin['პროდ. ჯგუფი'] == 'SKIN CARE']
-        df_full = df_skin.copy()
-
-        grouped_skincare = df_skincare.groupby(['თანამშრომელი']).agg({'თანხა': 'sum'}).reset_index()
-        grouped_full = df_full.groupby(['თანამშრომელი']).agg({'თანხა': 'sum'}).reset_index()
-
-        combined = pd.merge(grouped_skincare, grouped_full, on='თანამშრომელი', how='inner')
-        combined = combined.rename(columns={'თანხა_x': 'სქინქეარის გაყიდვები', 'თანხა_y': 'სრული გაყიდვები'})
-        combined['პროცენტული მაჩვენებელი'] = round(
-            (combined['სქინქეარის გაყიდვები'] / combined['სრული გაყიდვები']) * 100, 1
+        df_full = df_skin  # all valid categories
+        
+        # 3) Aggregate by employee
+        grouped_full = (
+            df_full.groupby('თანამშრომელი', as_index=False)['თანხა']
+            .sum()
+            .rename(columns={'თანხა': 'სრული გაყიდვები'})
         )
+        
+        grouped_skincare = (
+            df_skincare.groupby('თანამშრომელი', as_index=False)['თანხა']
+            .sum()
+            .rename(columns={'თანხა': 'სქინქეარის გაყიდვები'})
+        )
+        
+        # 4) IMPORTANT: left join (so employees with 0 skincare stay in)
+        combined = grouped_full.merge(grouped_skincare, on='თანამშრომელი', how='left')
+        combined['სქინქეარის გაყიდვები'] = combined['სქინქეარის გაყიდვები'].fillna(0)
+        
+        # 5) Employee-level % (round at the very end to avoid accumulation errors)
+        combined['პროცენტული მაჩვენებელი'] = (combined['სქინქეარის გაყიდვები'] / combined['სრული გაყიდვები']) * 100
+        combined['პროცენტული მაჩვენებელი'] = combined['პროცენტული მაჩვენებელი'].round(2)
         combined = combined.sort_values(by='პროცენტული მაჩვენებელი', ascending=False)
+        
+        # 6) OVERALL KPI computed from the same combined table (so it matches employee sums)
+        total_sales_all_emps = combined['სრული გაყიდვები'].sum()
+        total_skin_all_emps = combined['სქინქეარის გაყიდვები'].sum()
+        skincare_total_pct = round((total_skin_all_emps / total_sales_all_emps) * 100, 2)
+        
+        # 7) Display (unchanged UI)
+        st.markdown("---")
+        st.subheader("💆‍♀️ თანამშრომლების სქინქეარის გაყიდვების წილი")
+        st.dataframe(combined.head(10))
+        
+        # Overall skincare KPI card (use alongside your cross-selling KPI)
+        st.markdown("### 🌍 საერთო სქინქეარის წილი (ყველა თანამშრომელი ერთად)")
+        st.metric("💆‍♀️ საერთო სქინქეარის წილი", f"{skincare_total_pct} %")
+        
+        # Chart (unchanged)
+        fig2, ax2 = plt.subplots(figsize=(3.5, 2.2))
+        top_skin = combined.head(10)
+        bars2 = ax2.barh(top_skin['თანამშრომელი'], top_skin['პროცენტული მაჩვენებელი'], color='#1f77b4', height=0.5)
+        max_val2 = top_skin['პროცენტული მაჩვენებელი'].max()
+        ax2.set_xlim(0, max_val2 + 10)
+        for bar in bars2:
+            w = bar.get_width()
+            ax2.text(w + 0.5, bar.get_y() + bar.get_height()/1.6, f'{w}%', va='center', fontsize=6)
+        ax2.set_xlabel('% სქინქეარის გაყიდვები', fontsize=7)
+        ax2.set_ylabel('თანამშრომელი', fontsize=7)
+        ax2.tick_params(axis='both', labelsize=6)
+        ax2.invert_yaxis()
+        ax2.grid(True, axis='x', linestyle='--', alpha=0.4)
+        plt.tight_layout(rect=[0, 0, 0.95, 1])
+        st.pyplot(fig2, use_container_width=False)
 
-        # --- TOTAL SKINCARE (ALL EMPLOYEES TOGETHER) ---
-        skincare_total_sales = df_skincare['თანხა'].sum()
-        total_sales = df_full['თანხა'].sum()
-        skincare_total_pct = round((skincare_total_sales / total_sales) * 100, 2)
 
         # ============================================================
         # ✅ DISPLAY SECTION
@@ -187,3 +228,4 @@ if uploaded_file:
 
 else:
     st.info("👆 გთხოვთ ატვირთოთ ფაილი დასათვლელად")
+
