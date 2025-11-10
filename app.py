@@ -162,28 +162,28 @@ if uploaded_file:
         combined = combined.sort_values(by='პროცენტული მაჩვენებელი', ascending=False)
         st.dataframe(combined.head(10))
 
-        # ⭐ NEW TOTALS SECTION (GLOBAL SKINCARE %)
-        total_skin = df_skincare['თანხა'].sum()
-        total_all = df_full['თანხა'].sum()
-        skin_total_pct = round((total_skin / total_all) * 100, 2)
-        colB.metric("💆‍♀️ საერთო სქინქეარის წილი", f"{skin_total_pct} %")
+        # # ⭐ NEW TOTALS SECTION (GLOBAL SKINCARE %)
+        # total_skin = df_skincare['თანხა'].sum()
+        # total_all = df_full['თანხა'].sum()
+        # skin_total_pct = round((total_skin / total_all) * 100, 2)
+        # colB.metric("💆‍♀️ საერთო სქინქეარის წილი", f"{skin_total_pct} %")
 
-        # --- existing skincare chart ---
-        fig2, ax2 = plt.subplots(figsize=(3.5, 2.2))
-        top_skin = combined.head(10)
-        bars2 = ax2.barh(top_skin['თანამშრომელი'], top_skin['პროცენტული მაჩვენებელი'], color='#1f77b4', height=0.5)
-        max_val2 = top_skin['პროცენტული მაჩვენებელი'].max()
-        ax2.set_xlim(0, max_val2 + 10)
-        for bar in bars2:
-            width = bar.get_width()
-            ax2.text(width + 0.5, bar.get_y() + bar.get_height()/1.6, f'{width}%', va='center', fontsize=6)
-        ax2.set_xlabel('% სქინქეარის გაყიდვები', fontsize=7)
-        ax2.set_ylabel('თანამშრომელი', fontsize=7)
-        ax2.tick_params(axis='both', labelsize=6)
-        ax2.invert_yaxis()
-        ax2.grid(True, axis='x', linestyle='--', alpha=0.4)
-        plt.tight_layout(rect=[0, 0, 0.95, 1])
-        st.pyplot(fig2, use_container_width=False)
+        # # --- existing skincare chart ---
+        # fig2, ax2 = plt.subplots(figsize=(3.5, 2.2))
+        # top_skin = combined.head(10)
+        # bars2 = ax2.barh(top_skin['თანამშრომელი'], top_skin['პროცენტული მაჩვენებელი'], color='#1f77b4', height=0.5)
+        # max_val2 = top_skin['პროცენტული მაჩვენებელი'].max()
+        # ax2.set_xlim(0, max_val2 + 10)
+        # for bar in bars2:
+        #     width = bar.get_width()
+        #     ax2.text(width + 0.5, bar.get_y() + bar.get_height()/1.6, f'{width}%', va='center', fontsize=6)
+        # ax2.set_xlabel('% სქინქეარის გაყიდვები', fontsize=7)
+        # ax2.set_ylabel('თანამშრომელი', fontsize=7)
+        # ax2.tick_params(axis='both', labelsize=6)
+        # ax2.invert_yaxis()
+        # ax2.grid(True, axis='x', linestyle='--', alpha=0.4)
+        # plt.tight_layout(rect=[0, 0, 0.95, 1])
+        # st.pyplot(fig2, use_container_width=False)
 
         # ============================================================
         # 📥 DOWNLOAD EXCEL (ALL TABLES)
@@ -229,3 +229,4 @@ if uploaded_file:
 
 else:
     st.info("👆 გთხოვთ ატვირთოთ ფაილი დასათვლელად")
+
