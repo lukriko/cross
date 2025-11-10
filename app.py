@@ -86,7 +86,7 @@ if uploaded_file:
         cross_total_pct = round((total_big_baskets / total_baskets) * 100, 2)
 
         # ============================================================
-        # 💆‍♀️ SKINCARE SHARE (EMPLOYEE LEVEL + TOTAL) — FIXED
+        # 💆‍♀️ SKINCARE SHARE (EMPLOYEE LEVEL + TOTAL) — FIXED (NO REMOVALS)
         # ============================================================
         # 1) Filter once (exclude SERVICE / GIFT CARD), keep everything else identical
         df_skin = df_copy.copy()
@@ -94,47 +94,47 @@ if uploaded_file:
             (df_skin['თანხა'] != 0)
             & (~df_skin['პროდ. ჯგუფი'].isin(['SERVICE', 'GIFT CARD']))
         ]
-        
+
         # 2) Separate skincare vs all (after the same filter)
         df_skincare = df_skin[df_skin['პროდ. ჯგუფი'] == 'SKIN CARE']
         df_full = df_skin  # all valid categories
-        
-        # 3) Aggregate by employee
+
+        # 3) Aggregate by employee (TOTALS FIRST, THEN LEFT JOIN SKINCARE)
         grouped_full = (
             df_full.groupby('თანამშრომელი', as_index=False)['თანხა']
             .sum()
             .rename(columns={'თანხა': 'სრული გაყიდვები'})
         )
-        
+
         grouped_skincare = (
             df_skincare.groupby('თანამშრომელი', as_index=False)['თანხა']
             .sum()
             .rename(columns={'თანხა': 'სქინქეარის გაყიდვები'})
         )
-        
-        # 4) IMPORTANT: left join (so employees with 0 skincare stay in)
+
+        # 4) Left join to keep employees with zero skincare; fillna(0)
         combined = grouped_full.merge(grouped_skincare, on='თანამშრომელი', how='left')
         combined['სქინქეარის გაყიდვები'] = combined['სქინქეარის გაყიდვები'].fillna(0)
-        
-        # 5) Employee-level % (round at the very end to avoid accumulation errors)
+
+        # 5) Employee-level % (round at the very end)
         combined['პროცენტული მაჩვენებელი'] = (combined['სქინქეარის გაყიდვები'] / combined['სრული გაყიდვები']) * 100
         combined['პროცენტული მაჩვენებელი'] = combined['პროცენტული მაჩვენებელი'].round(2)
         combined = combined.sort_values(by='პროცენტული მაჩვენებელი', ascending=False)
-        
+
         # 6) OVERALL KPI computed from the same combined table (so it matches employee sums)
         total_sales_all_emps = combined['სრული გაყიდვები'].sum()
         total_skin_all_emps = combined['სქინქეარის გაყიდვები'].sum()
         skincare_total_pct = round((total_skin_all_emps / total_sales_all_emps) * 100, 2)
-        
-        # 7) Display (unchanged UI)
+
+        # 7) Display (unchanged UI below; nothing removed)
         st.markdown("---")
         st.subheader("💆‍♀️ თანამშრომლების სქინქეარის გაყიდვების წილი")
         st.dataframe(combined.head(10))
-        
+
         # Overall skincare KPI card (use alongside your cross-selling KPI)
         st.markdown("### 🌍 საერთო სქინქეარის წილი (ყველა თანამშრომელი ერთად)")
         st.metric("💆‍♀️ საერთო სქინქეარის წილი", f"{skincare_total_pct} %")
-        
+
         # Chart (unchanged)
         fig2, ax2 = plt.subplots(figsize=(3.5, 2.2))
         top_skin = combined.head(10)
@@ -152,9 +152,8 @@ if uploaded_file:
         plt.tight_layout(rect=[0, 0, 0.95, 1])
         st.pyplot(fig2, use_container_width=False)
 
-
         # ============================================================
-        # ✅ DISPLAY SECTION
+        # ✅ DISPLAY SECTION (UNCHANGED)
         # ============================================================
         st.success("✅ მონაცემები აიტვირთა წარმატებით!")
 
@@ -186,7 +185,7 @@ if uploaded_file:
         plt.tight_layout(rect=[0, 0, 0.95, 1])
         st.pyplot(fig, use_container_width=False)
 
-        # --- SKINCARE TABLE & CHART ---
+        # --- SKINCARE TABLE & CHART (already shown above, kept as-is below too) ---
         st.markdown("---")
         st.subheader("💆‍♀️ თანამშრომლების სქინქეარის გაყიდვების წილი")
         st.dataframe(combined.head(10))
@@ -208,7 +207,7 @@ if uploaded_file:
         st.pyplot(fig2, use_container_width=False)
 
         # ============================================================
-        # 📥 DOWNLOAD EXCEL
+        # 📥 DOWNLOAD EXCEL (UNCHANGED)
         # ============================================================
         output = BytesIO()
         with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
@@ -228,4 +227,3 @@ if uploaded_file:
 
 else:
     st.info("👆 გთხოვთ ატვირთოთ ფაილი დასათვლელად")
-
