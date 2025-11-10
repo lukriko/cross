@@ -107,35 +107,35 @@ if uploaded_file:
         # ============================================================
         # 🏬 STORE-LEVEL TOTALS — CROSS-SELLING (existing)
         # ============================================================
-        st.markdown("---")
-        st.subheader("🏬 ობიექტის საშუალო ქროს-სელინგის მაჩვენებელი")
+        # st.markdown("---")
+        # st.subheader("🏬 ობიექტის საშუალო ქროს-სელინგის მაჩვენებელი")
 
-        store_grouped = (
-            grouped.groupby(['ზედდებული'])
-            .agg({
-                '2_ზე_მეტი_მოცემულ_კალათაში': 'sum',
-                'კალათაში_არსებული_პროდუქტები': 'count'
-            })
-            .rename(columns={'კალათაში_არსებული_პროდუქტები': 'სულ_კალათები'})
-            .reset_index()
-        )
-        store_grouped['პროცენტულობა'] = round(
-            (store_grouped['2_ზე_მეტი_მოცემულ_კალათაში'] / store_grouped['სულ_კალათები']) * 100, 2
-        )
-        store_grouped = store_grouped.sort_values(by='პროცენტულობა', ascending=False)
-        st.dataframe(store_grouped)
+        # store_grouped = (
+        #     grouped.groupby(['ზედდებული'])
+        #     .agg({
+        #         '2_ზე_მეტი_მოცემულ_კალათაში': 'sum',
+        #         'კალათაში_არსებული_პროდუქტები': 'count'
+        #     })
+        #     .rename(columns={'კალათაში_არსებული_პროდუქტები': 'სულ_კალათები'})
+        #     .reset_index()
+        # )
+        # store_grouped['პროცენტულობა'] = round(
+        #     (store_grouped['2_ზე_მეტი_მოცემულ_კალათაში'] / store_grouped['სულ_კალათები']) * 100, 2
+        # )
+        # store_grouped = store_grouped.sort_values(by='პროცენტულობა', ascending=False)
+        # st.dataframe(store_grouped)
 
-        fig_store, ax_store = plt.subplots(figsize=(4, 2.5))
-        bars_store = ax_store.barh(store_grouped['ზედდებული'], store_grouped['პროცენტულობა'], color='#16a34a', height=0.5)
-        ax_store.invert_yaxis()
-        ax_store.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=7)
-        ax_store.set_ylabel('ობიექტი', fontsize=7)
-        ax_store.grid(True, axis='x', linestyle='--', alpha=0.4)
-        for bar in bars_store:
-            w = bar.get_width()
-            ax_store.text(w + 0.5, bar.get_y() + bar.get_height()/2, f'{w}%', va='center', fontsize=6)
-        plt.tight_layout()
-        st.pyplot(fig_store, use_container_width=False)
+        # fig_store, ax_store = plt.subplots(figsize=(4, 2.5))
+        # bars_store = ax_store.barh(store_grouped['ზედდებული'], store_grouped['პროცენტულობა'], color='#16a34a', height=0.5)
+        # ax_store.invert_yaxis()
+        # ax_store.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=7)
+        # ax_store.set_ylabel('ობიექტი', fontsize=7)
+        # ax_store.grid(True, axis='x', linestyle='--', alpha=0.4)
+        # for bar in bars_store:
+        #     w = bar.get_width()
+        #     ax_store.text(w + 0.5, bar.get_y() + bar.get_height()/2, f'{w}%', va='center', fontsize=6)
+        # plt.tight_layout()
+        # st.pyplot(fig_store, use_container_width=False)
 
         # ============================================================
         # 💆‍♀️ SKINCARE SHARE (EMPLOYEE LEVEL)
@@ -162,28 +162,28 @@ if uploaded_file:
         combined = combined.sort_values(by='პროცენტული მაჩვენებელი', ascending=False)
         st.dataframe(combined.head(10))
 
-        # # ⭐ NEW TOTALS SECTION (GLOBAL SKINCARE %)
-        # total_skin = df_skincare['თანხა'].sum()
-        # total_all = df_full['თანხა'].sum()
-        # skin_total_pct = round((total_skin / total_all) * 100, 2)
-        # colB.metric("💆‍♀️ საერთო სქინქეარის წილი", f"{skin_total_pct} %")
+        # ⭐ NEW TOTALS SECTION (GLOBAL SKINCARE %)
+        total_skin = df_skincare['თანხა'].sum()
+        total_all = df_full['თანხა'].sum()
+        skin_total_pct = round((total_skin / total_all) * 100, 2)
+        colB.metric("💆‍♀️ საერთო სქინქეარის წილი", f"{skin_total_pct} %")
 
-        # # --- existing skincare chart ---
-        # fig2, ax2 = plt.subplots(figsize=(3.5, 2.2))
-        # top_skin = combined.head(10)
-        # bars2 = ax2.barh(top_skin['თანამშრომელი'], top_skin['პროცენტული მაჩვენებელი'], color='#1f77b4', height=0.5)
-        # max_val2 = top_skin['პროცენტული მაჩვენებელი'].max()
-        # ax2.set_xlim(0, max_val2 + 10)
-        # for bar in bars2:
-        #     width = bar.get_width()
-        #     ax2.text(width + 0.5, bar.get_y() + bar.get_height()/1.6, f'{width}%', va='center', fontsize=6)
-        # ax2.set_xlabel('% სქინქეარის გაყიდვები', fontsize=7)
-        # ax2.set_ylabel('თანამშრომელი', fontsize=7)
-        # ax2.tick_params(axis='both', labelsize=6)
-        # ax2.invert_yaxis()
-        # ax2.grid(True, axis='x', linestyle='--', alpha=0.4)
-        # plt.tight_layout(rect=[0, 0, 0.95, 1])
-        # st.pyplot(fig2, use_container_width=False)
+        # --- existing skincare chart ---
+        fig2, ax2 = plt.subplots(figsize=(3.5, 2.2))
+        top_skin = combined.head(10)
+        bars2 = ax2.barh(top_skin['თანამშრომელი'], top_skin['პროცენტული მაჩვენებელი'], color='#1f77b4', height=0.5)
+        max_val2 = top_skin['პროცენტული მაჩვენებელი'].max()
+        ax2.set_xlim(0, max_val2 + 10)
+        for bar in bars2:
+            width = bar.get_width()
+            ax2.text(width + 0.5, bar.get_y() + bar.get_height()/1.6, f'{width}%', va='center', fontsize=6)
+        ax2.set_xlabel('% სქინქეარის გაყიდვები', fontsize=7)
+        ax2.set_ylabel('თანამშრომელი', fontsize=7)
+        ax2.tick_params(axis='both', labelsize=6)
+        ax2.invert_yaxis()
+        ax2.grid(True, axis='x', linestyle='--', alpha=0.4)
+        plt.tight_layout(rect=[0, 0, 0.95, 1])
+        st.pyplot(fig2, use_container_width=False)
 
         # ============================================================
         # 📥 DOWNLOAD EXCEL (ALL TABLES)
@@ -229,4 +229,5 @@ if uploaded_file:
 
 else:
     st.info("👆 გთხოვთ ატვირთოთ ფაილი დასათვლელად")
+
 
