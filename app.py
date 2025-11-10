@@ -4,17 +4,19 @@ import matplotlib.pyplot as plt
 from io import BytesIO
 import seaborn as sns
 
-# --- Password ---
+# ============================================================
+# 🔐 PASSWORD PROTECTION
+# ============================================================
 PASSWORD = "1234"
 password_input = st.text_input("პაროლი:", type="password")
-
 if password_input != PASSWORD:
     st.warning("🔒 გთხოვთ შეიყვანოთ სწორი პაროლი")
     st.stop()
 
-# Streamlit page config
+# ============================================================
+# ⚙️ PAGE CONFIG
+# ============================================================
 st.set_page_config(page_title="ქროს-სელინგის მაჩვენებელი", layout="wide")
-
 st.title("🛒 ქროს-სელინგისა და სქინქეარის პროცენტული მაჩვენებელი")
 st.write("ატვირთეთ ობიექტის რეალიზაცია (Excel ფორმატში)")
 
@@ -22,15 +24,17 @@ uploaded_file = st.file_uploader("ატვირთვა", type=["xls", "xlsx"
 
 if uploaded_file:
     try:
-        # --- Determine engine based on file extension ---
+        # --- Detect Excel engine ---
         file_extension = uploaded_file.name.split('.')[-1]
         if file_extension == 'xls':
             df_copy = pd.read_excel(uploaded_file, sheet_name='Sheet', engine='xlrd')
-        else:  # xlsx
+        else:
             df_copy = pd.read_excel(uploaded_file, sheet_name='Sheet', engine='openpyxl')
 
-        # --- Filter data for cross-selling ---
-        unwanted_categories_cross = ['POP', 'COURIER', 'GIFT CARD', 'SERVICE','VISAGE','UNIFORM','FURNITURE','-']
+        # ============================================================
+        # 🧮 CROSS-SELLING CALCULATIONS (EMPLOYEE LEVEL)
+        # ============================================================
+        unwanted_categories_cross = ['POP', 'COURIER', 'GIFT CARD', 'SERVICE', 'VISAGE', 'UNIFORM', 'FURNITURE', '-']
         df = df_copy.copy()
         df = df[
             (df['თანხა'] != 0)
@@ -39,7 +43,6 @@ if uploaded_file:
             & (~df['პროდ. ჯგუფი'].isin(unwanted_categories_cross))
         ].dropna(subset=['თანამშრომელი', 'ზედდებული'])
 
-        # --- Cross-selling calculations ---
         grouped = (
             df.groupby(['თანამშრომელი', 'ზედდებული'])
             .size()
@@ -67,13 +70,12 @@ if uploaded_file:
 
         st.success("✅ მონაცემები აიტვირთა წარმატებით!")
         st.markdown("---")
-        st.subheader("თანამშრომლები ქროს-სელინგის მაჩვენებლით")
+        st.subheader("👩‍💼 თანამშრომლები ქროს-სელინგის მაჩვენებლით")
         st.dataframe(grouped2.head(10))
 
-        # --- Cross-selling Chart ---
+        # --- Cross-selling Chart (Employee) ---
         st.markdown("---")
-        st.subheader("ქროს-სელინგის გრაფიკი")
-
+        st.subheader("📊 ქროს-სელინგის გრაფიკი (თანამშრომლები)")
         top = grouped2.head(10)
         sns.set_style("whitegrid")
 
@@ -94,32 +96,50 @@ if uploaded_file:
         plt.tight_layout(rect=[0, 0, 0.95, 1])
         st.pyplot(fig, use_container_width=False)
 
-        # --- Expanded chart ---
-        with st.expander("🔍 სრულად ნახვა / დახურვა"):
-            fig_big, ax_big = plt.subplots(figsize=(8, 4))
-            bars_big = ax_big.barh(top['თანამშრომელი'], top['პროცენტულობა'], color='#2ca02c')
-            max_val_big = top['პროცენტულობა'].max()
-            ax_big.set_xlim(0, max_val_big + 10)
-            for bar in bars_big:
-                width = bar.get_width()
-                ax_big.text(width + 0.7, bar.get_y() + bar.get_height()/2, f'{width}%', va='center', fontsize=9)
-            ax_big.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=10)
-            ax_big.set_ylabel('თანამშრომელი', fontsize=10)
-            ax_big.invert_yaxis()
-            ax_big.grid(True, axis='x', linestyle='--', alpha=0.5)
-            plt.tight_layout(rect=[0, 0, 0.95, 1])
-            st.pyplot(fig_big, use_container_width=False)
-
-        # --- SKIN CARE Share (POP NOT EXCLUDED) ---
+        # ============================================================
+        # 🏬 STORE-LEVEL TOTALS — CROSS-SELLING
+        # ============================================================
         st.markdown("---")
-        st.subheader("💆‍♀️ სქინქეარის გაყიდვების წილი")
+        st.subheader("🏬 ობიექტის საშუალო ქროს-სელინგის მაჩვენებელი")
+
+        store_grouped = (
+            grouped.groupby(['ზედდებული'])
+            .agg({
+                '2_ზე_მეტი_მოცემულ_კალათაში': 'sum',
+                'კალათაში_არსებული_პროდუქტები': 'count'
+            })
+            .rename(columns={'კალათაში_არსებული_პროდუქტები': 'სულ_კალათები'})
+            .reset_index()
+        )
+        store_grouped['პროცენტულობა'] = round(
+            (store_grouped['2_ზე_მეტი_მოცემულ_კალათაში'] / store_grouped['სულ_კალათები']) * 100, 2
+        )
+        store_grouped = store_grouped.sort_values(by='პროცენტულობა', ascending=False)
+        st.dataframe(store_grouped)
+
+        fig_store, ax_store = plt.subplots(figsize=(4, 2.5))
+        bars_store = ax_store.barh(store_grouped['ზედდებული'], store_grouped['პროცენტულობა'], color='#16a34a', height=0.5)
+        ax_store.invert_yaxis()
+        ax_store.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=7)
+        ax_store.set_ylabel('ობიექტი', fontsize=7)
+        ax_store.grid(True, axis='x', linestyle='--', alpha=0.4)
+        for bar in bars_store:
+            w = bar.get_width()
+            ax_store.text(w + 0.5, bar.get_y() + bar.get_height()/2, f'{w}%', va='center', fontsize=6)
+        plt.tight_layout()
+        st.pyplot(fig_store, use_container_width=False)
+
+        # ============================================================
+        # 💆‍♀️ SKINCARE SHARE (EMPLOYEE LEVEL)
+        # ============================================================
+        st.markdown("---")
+        st.subheader("💆‍♀️ თანამშრომლების სქინქეარის გაყიდვების წილი")
 
         df_skin = df_copy.copy()
         df_skin = df_skin[
             (df_skin['თანხა'] != 0)
             & (~df_skin['პროდ. ჯგუფი'].isin(['SERVICE', 'GIFT CARD']))
         ]
-
         df_skincare = df_skin[df_skin['პროდ. ჯგუფი'] == 'SKIN CARE']
         df_full = df_skin.copy()
 
@@ -134,19 +154,15 @@ if uploaded_file:
         combined = combined.sort_values(by='პროცენტული მაჩვენებელი', ascending=False)
         st.dataframe(combined.head(10))
 
-        # --- SKIN CARE Chart ---
-        sns.set_style("whitegrid")
         fig2, ax2 = plt.subplots(figsize=(3.5, 2.2))
         top_skin = combined.head(10)
         bars2 = ax2.barh(top_skin['თანამშრომელი'], top_skin['პროცენტული მაჩვენებელი'], color='#1f77b4', height=0.5)
 
         max_val2 = top_skin['პროცენტული მაჩვენებელი'].max()
         ax2.set_xlim(0, max_val2 + 10)
-
         for bar in bars2:
             width = bar.get_width()
             ax2.text(width + 0.5, bar.get_y() + bar.get_height()/1.6, f'{width}%', va='center', fontsize=6)
-
         ax2.set_xlabel('% სქინქეარის გაყიდვები', fontsize=7)
         ax2.set_ylabel('თანამშრომელი', fontsize=7)
         ax2.tick_params(axis='both', labelsize=6)
@@ -155,11 +171,43 @@ if uploaded_file:
         plt.tight_layout(rect=[0, 0, 0.95, 1])
         st.pyplot(fig2, use_container_width=False)
 
-        # --- Download Excel (both datasets) ---
+        # ============================================================
+        # 🧴 STORE-LEVEL TOTALS — SKINCARE SHARE
+        # ============================================================
+        st.markdown("---")
+        st.subheader("🏬 ობიექტის სქინქეარის წილი")
+
+        store_skin = df_skin.groupby('ზედდებული', as_index=False)['თანხა'].sum().rename(columns={'თანხა': 'სრული გაყიდვები'})
+        store_skin_part = df_skincare.groupby('ზედდებული', as_index=False)['თანხა'].sum().rename(columns={'თანხა': 'სქინქეარის გაყიდვები'})
+
+        store_combined = pd.merge(store_skin_part, store_skin, on='ზედდებული', how='left')
+        store_combined['პროცენტული მაჩვენებელი'] = round(
+            (store_combined['სქინქეარის გაყიდვები'] / store_combined['სრული გაყიდვები']) * 100, 2
+        )
+        store_combined = store_combined.sort_values(by='პროცენტული მაჩვენებელი', ascending=False)
+        st.dataframe(store_combined)
+
+        fig_skin_store, ax_skin_store = plt.subplots(figsize=(4, 2.5))
+        bars_skin_store = ax_skin_store.barh(store_combined['ზედდებული'], store_combined['პროცენტული მაჩვენებელი'], color='#1f77b4', height=0.5)
+        ax_skin_store.invert_yaxis()
+        ax_skin_store.set_xlabel('% სქინქეარის გაყიდვები', fontsize=7)
+        ax_skin_store.set_ylabel('ობიექტი', fontsize=7)
+        ax_skin_store.grid(True, axis='x', linestyle='--', alpha=0.4)
+        for bar in bars_skin_store:
+            w = bar.get_width()
+            ax_skin_store.text(w + 0.5, bar.get_y() + bar.get_height()/2, f'{w}%', va='center', fontsize=6)
+        plt.tight_layout()
+        st.pyplot(fig_skin_store, use_container_width=False)
+
+        # ============================================================
+        # 📥 DOWNLOAD EXCEL (ALL TABLES)
+        # ============================================================
         output = BytesIO()
         with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
             grouped2.to_excel(writer, index=False, sheet_name='ქროს-სელინგი')
+            store_grouped.to_excel(writer, index=False, sheet_name='ქროს-სელინგი ობიექტით')
             combined.to_excel(writer, index=False, sheet_name='სქინქეარი')
+            store_combined.to_excel(writer, index=False, sheet_name='სქინქეარი ობიექტით')
         excel_data = output.getvalue()
 
         custom_button = """
@@ -193,7 +241,6 @@ if uploaded_file:
 
     except Exception as e:
         st.error(f"❌ შეცდომა ფაილის დამუშავებისას: {e}")
+
 else:
     st.info("👆 გთხოვთ ატვირთოთ ფაილი დასათვლელად")
-
-
