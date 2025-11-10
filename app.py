@@ -43,6 +43,7 @@ if uploaded_file:
             & (~df['პროდ. ჯგუფი'].isin(unwanted_categories_cross))
         ].dropna(subset=['თანამშრომელი', 'ზედდებული'])
 
+        # --- Basket logic (per employee) ---
         grouped = (
             df.groupby(['თანამშრომელი', 'ზედდებული'])
             .size()
@@ -71,96 +72,28 @@ if uploaded_file:
         # ============================================================
         # 🌍 TOTAL COMBINED CROSS-SELLING (ALL EMPLOYEES TOGETHER)
         # ============================================================
-        overall_grouped = (
+        overall = (
             df.groupby(['ზედდებული'])
             .size()
             .reset_index(name='კალათაში_არსებული_პროდუქტები')
         )
-        overall_grouped['2_ზე_მეტი_მოცემულ_კალათაში'] = (
-            overall_grouped['კალათაში_არსებული_პროდუქტები'] > 2
+        overall['2_ზე_მეტი_მოცემულ_კალათაში'] = (
+            overall['კალათაში_არსებული_პროდუქტები'] > 2
         ).astype(int)
 
-        total_baskets = overall_grouped.shape[0]
-        total_big_baskets = overall_grouped['2_ზე_მეტი_მოცემულ_კალათაში'].sum()
+        total_baskets = overall.shape[0]
+        total_big_baskets = overall['2_ზე_მეტი_მოცემულ_კალათაში'].sum()
         cross_total_pct = round((total_big_baskets / total_baskets) * 100, 2)
 
-        st.success("✅ მონაცემები აიტვირთა წარმატებით!")
-        st.markdown("---")
-        st.subheader("🌍 საერთო მაჩვენებლები (ყველა თანამშრომელი ერთად)")
-        st.metric("🛍️ საერთო ქროს-სელინგის მაჩვენებელი", f"{cross_total_pct} %")
-
         # ============================================================
-        # 👩‍💼 EMPLOYEE-LEVEL DISPLAY
+        # 💆‍♀️ SKINCARE SHARE (EMPLOYEE LEVEL + TOTAL)
         # ============================================================
-        st.markdown("---")
-        st.subheader("👩‍💼 თანამშრომლები ქროს-სელინგის მაჩვენებლით")
-        st.dataframe(grouped2.head(10))
-
-        # --- Cross-selling Chart (Employee) ---
-        st.markdown("---")
-        st.subheader("📊 ქროს-სელინგის გრაფიკი (თანამშრომლები)")
-        top = grouped2.head(10)
-        sns.set_style("whitegrid")
-
-        fig, ax = plt.subplots(figsize=(3.5, 2.2))
-        bars = ax.barh(top['თანამშრომელი'], top['პროცენტულობა'], color='#2ca02c', height=0.5)
-        max_val = top['პროცენტულობა'].max()
-        ax.set_xlim(0, max_val + 10)
-        for bar in bars:
-            width = bar.get_width()
-            ax.text(width + 0.5, bar.get_y() + bar.get_height()/1.6, f'{width}%', va='center', fontsize=6)
-        ax.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=7)
-        ax.set_ylabel('თანამშრომელი', fontsize=7)
-        ax.tick_params(axis='both', labelsize=6)
-        ax.invert_yaxis()
-        ax.grid(True, axis='x', linestyle='--', alpha=0.4)
-        plt.tight_layout(rect=[0, 0, 0.95, 1])
-        st.pyplot(fig, use_container_width=False)
-
-        # ============================================================
-        # 🏬 STORE-LEVEL TOTALS — CROSS-SELLING
-        # ============================================================
-        st.markdown("---")
-        st.subheader("🏬 ობიექტის საშუალო ქროს-სელინგის მაჩვენებელი")
-
-        store_grouped = (
-            grouped.groupby(['ზედდებული'])
-            .agg({
-                '2_ზე_მეტი_მოცემულ_კალათაში': 'sum',
-                'კალათაში_არსებული_პროდუქტები': 'count'
-            })
-            .rename(columns={'კალათაში_არსებული_პროდუქტები': 'სულ_კალათები'})
-            .reset_index()
-        )
-        store_grouped['პროცენტულობა'] = round(
-            (store_grouped['2_ზე_მეტი_მოცემულ_კალათაში'] / store_grouped['სულ_კალათები']) * 100, 2
-        )
-        store_grouped = store_grouped.sort_values(by='პროცენტულობა', ascending=False)
-        st.dataframe(store_grouped)
-
-        fig_store, ax_store = plt.subplots(figsize=(4, 2.5))
-        bars_store = ax_store.barh(store_grouped['ზედდებული'], store_grouped['პროცენტულობა'], color='#16a34a', height=0.5)
-        ax_store.invert_yaxis()
-        ax_store.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=7)
-        ax_store.set_ylabel('ობიექტი', fontsize=7)
-        ax_store.grid(True, axis='x', linestyle='--', alpha=0.4)
-        for bar in bars_store:
-            w = bar.get_width()
-            ax_store.text(w + 0.5, bar.get_y() + bar.get_height()/2, f'{w}%', va='center', fontsize=6)
-        plt.tight_layout()
-        st.pyplot(fig_store, use_container_width=False)
-
-        # ============================================================
-        # 💆‍♀️ SKINCARE SHARE (EMPLOYEE LEVEL)
-        # ============================================================
-        st.markdown("---")
-        st.subheader("💆‍♀️ თანამშრომლების სქინქეარის გაყიდვების წილი")
-
         df_skin = df_copy.copy()
         df_skin = df_skin[
             (df_skin['თანხა'] != 0)
             & (~df_skin['პროდ. ჯგუფი'].isin(['SERVICE', 'GIFT CARD']))
         ]
+
         df_skincare = df_skin[df_skin['პროდ. ჯგუფი'] == 'SKIN CARE']
         df_full = df_skin.copy()
 
@@ -173,26 +106,58 @@ if uploaded_file:
             (combined['სქინქეარის გაყიდვები'] / combined['სრული გაყიდვები']) * 100, 1
         )
         combined = combined.sort_values(by='პროცენტული მაჩვენებელი', ascending=False)
+
+        # --- TOTAL SKINCARE (ALL EMPLOYEES TOGETHER) ---
+        skincare_total_sales = df_skincare['თანხა'].sum()
+        total_sales = df_full['თანხა'].sum()
+        skincare_total_pct = round((skincare_total_sales / total_sales) * 100, 2)
+
+        # ============================================================
+        # ✅ DISPLAY SECTION
+        # ============================================================
+        st.success("✅ მონაცემები აიტვირთა წარმატებით!")
+
+        st.markdown("---")
+        st.subheader("🌍 საერთო მაჩვენებლები (ყველა თანამშრომელი ერთად)")
+        col1, col2 = st.columns(2)
+        col1.metric("🛍️ საერთო ქროს-სელინგის მაჩვენებელი", f"{cross_total_pct} %")
+        col2.metric("💆‍♀️ საერთო სქინქეარის წილი", f"{skincare_total_pct} %")
+
+        st.markdown("---")
+        st.subheader("👩‍💼 თანამშრომლები ქროს-სელინგის მაჩვენებლით")
+        st.dataframe(grouped2.head(10))
+
+        # --- Cross-selling Chart (Employee) ---
+        sns.set_style("whitegrid")
+        fig, ax = plt.subplots(figsize=(3.5, 2.2))
+        top = grouped2.head(10)
+        bars = ax.barh(top['თანამშრომელი'], top['პროცენტულობა'], color='#2ca02c', height=0.5)
+        max_val = top['პროცენტულობა'].max()
+        ax.set_xlim(0, max_val + 10)
+        for bar in bars:
+            w = bar.get_width()
+            ax.text(w + 0.5, bar.get_y() + bar.get_height()/1.6, f'{w}%', va='center', fontsize=6)
+        ax.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=7)
+        ax.set_ylabel('თანამშრომელი', fontsize=7)
+        ax.tick_params(axis='both', labelsize=6)
+        ax.invert_yaxis()
+        ax.grid(True, axis='x', linestyle='--', alpha=0.4)
+        plt.tight_layout(rect=[0, 0, 0.95, 1])
+        st.pyplot(fig, use_container_width=False)
+
+        # --- SKINCARE TABLE & CHART ---
+        st.markdown("---")
+        st.subheader("💆‍♀️ თანამშრომლების სქინქეარის გაყიდვების წილი")
         st.dataframe(combined.head(10))
 
-        # ============================================================
-        # 🌍 TOTAL COMBINED SKINCARE SHARE (ALL EMPLOYEES TOGETHER)
-        # ============================================================
-        total_skin = df_skincare['თანხა'].sum()
-        total_all = df_full['თანხა'].sum()
-        skin_total_pct = round((total_skin / total_all) * 100, 2)
-        st.markdown("### 🌍 საერთო სქინქეარის წილი (ყველა თანამშრომელი ერთად)")
-        st.metric("💆‍♀️ საერთო სქინქეარის წილი", f"{skin_total_pct} %")
-
-        # --- existing skincare chart ---
         fig2, ax2 = plt.subplots(figsize=(3.5, 2.2))
         top_skin = combined.head(10)
         bars2 = ax2.barh(top_skin['თანამშრომელი'], top_skin['პროცენტული მაჩვენებელი'], color='#1f77b4', height=0.5)
         max_val2 = top_skin['პროცენტული მაჩვენებელი'].max()
         ax2.set_xlim(0, max_val2 + 10)
         for bar in bars2:
-            width = bar.get_width()
-            ax2.text(width + 0.5, bar.get_y() + bar.get_height()/1.6, f'{width}%', va='center', fontsize=6)
+            w = bar.get_width()
+            ax2.text(w + 0.5, bar.get_y() + bar.get_height()/1.6, f'{w}%', va='center', fontsize=6)
         ax2.set_xlabel('% სქინქეარის გაყიდვები', fontsize=7)
         ax2.set_ylabel('თანამშრომელი', fontsize=7)
         ax2.tick_params(axis='both', labelsize=6)
@@ -202,36 +167,13 @@ if uploaded_file:
         st.pyplot(fig2, use_container_width=False)
 
         # ============================================================
-        # 📥 DOWNLOAD EXCEL (ALL TABLES)
+        # 📥 DOWNLOAD EXCEL
         # ============================================================
         output = BytesIO()
         with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
             grouped2.to_excel(writer, index=False, sheet_name='ქროს-სელინგი')
-            store_grouped.to_excel(writer, index=False, sheet_name='ქროს-სელინგი ობიექტით')
             combined.to_excel(writer, index=False, sheet_name='სქინქეარი')
         excel_data = output.getvalue()
-
-        custom_button = """
-        <style>
-        div.stDownloadButton > button {
-            background-color: white;
-            color: black;
-            font-size: 18px;
-            font-weight: 600;
-            border-radius: 10px;
-            border: 2px solid #2ca02c;
-            padding: 12px 24px;
-            transition: all 0.3s ease;
-            width: 100%;
-        }
-        div.stDownloadButton > button:hover {
-            background-color: #e6ffe6;
-            color: #1a1a1a;
-            border-color: #1e8f1e;
-        }
-        </style>
-        """
-        st.markdown(custom_button, unsafe_allow_html=True)
 
         st.download_button(
             label="📥 გადმოწერა Excel ფორმატში",
