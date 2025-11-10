@@ -68,28 +68,20 @@ if uploaded_file:
         )
         grouped2 = grouped2.sort_values(by='პროცენტულობა', ascending=False)
 
+        # ⭐ NEW TOTALS SECTION (GLOBAL CROSS-SELLING %)
+        total_cross = grouped['2_ზე_მეტი_მოცემულ_კალათაში'].sum()
+        total_baskets = grouped.shape[0]
+        cross_total_pct = round((total_cross / total_baskets) * 100, 2)
+
+        st.markdown("---")
+        st.markdown("### 📊 საერთო მაჩვენებლები (ყველა ობიექტი ერთად)")
+        colA, colB = st.columns(2)
+        colA.metric("🛍️ საერთო ქროს-სელინგის მაჩვენებელი", f"{cross_total_pct} %")
+
         st.success("✅ მონაცემები აიტვირთა წარმატებით!")
         st.markdown("---")
         st.subheader("👩‍💼 თანამშრომლები ქროს-სელინგის მაჩვენებლით")
         st.dataframe(grouped2.head(10))
-
-        # ⭐ NEW SECTION: STORE-LEVEL CROSS-SELLING TOTAL CARDS
-        store_group_cards = (
-            grouped.groupby('ზედდებული')
-            .agg({
-                '2_ზე_მეტი_მოცემულ_კალათაში': 'sum',
-                'კალათაში_არსებული_პროდუქტები': 'count'
-            })
-            .rename(columns={'კალათაში_არსებული_პროდუქტები': 'სულ_კალათები'})
-            .reset_index()
-        )
-        store_group_cards['პროცენტულობა'] = round(
-            (store_group_cards['2_ზე_მეტი_მოცემულ_კალათაში'] / store_group_cards['სულ_კალათები']) * 100, 2
-        )
-        st.markdown("### 🏬 ობიექტების ჯამური ქროს-სელინგის მაჩვენებლები")
-        cols_cards = st.columns(len(store_group_cards))
-        for i, row in enumerate(store_group_cards.itertuples()):
-            cols_cards[i].metric(label=row.ზედდებული, value=f"{row.პროცენტულობა} %")
 
         # --- Cross-selling Chart (Employee) ---
         st.markdown("---")
@@ -101,11 +93,9 @@ if uploaded_file:
         bars = ax.barh(top['თანამშრომელი'], top['პროცენტულობა'], color='#2ca02c', height=0.5)
         max_val = top['პროცენტულობა'].max()
         ax.set_xlim(0, max_val + 10)
-
         for bar in bars:
             width = bar.get_width()
             ax.text(width + 0.5, bar.get_y() + bar.get_height()/1.6, f'{width}%', va='center', fontsize=6)
-
         ax.set_xlabel('% კალათები 3+ პროდუქტით', fontsize=7)
         ax.set_ylabel('თანამშრომელი', fontsize=7)
         ax.tick_params(axis='both', labelsize=6)
@@ -115,7 +105,7 @@ if uploaded_file:
         st.pyplot(fig, use_container_width=False)
 
         # ============================================================
-        # 🏬 STORE-LEVEL TOTALS — CROSS-SELLING
+        # 🏬 STORE-LEVEL TOTALS — CROSS-SELLING (existing)
         # ============================================================
         st.markdown("---")
         st.subheader("🏬 ობიექტის საშუალო ქროს-სელინგის მაჩვენებელი")
@@ -172,17 +162,11 @@ if uploaded_file:
         combined = combined.sort_values(by='პროცენტული მაჩვენებელი', ascending=False)
         st.dataframe(combined.head(10))
 
-        # ⭐ NEW SECTION: STORE-LEVEL SKINCARE CARDS
-        store_skin_full = df_full.groupby('ზედდებული')['თანხა'].sum().reset_index(name='სრული გაყიდვები')
-        store_skin_part = df_skincare.groupby('ზედდებული')['თანხა'].sum().reset_index(name='სქინქეარის გაყიდვები')
-        store_skin_merge = pd.merge(store_skin_part, store_skin_full, on='ზედდებული', how='left')
-        store_skin_merge['პროცენტულობა'] = round(
-            (store_skin_merge['სქინქეარის გაყიდვები'] / store_skin_merge['სრული გაყიდვები']) * 100, 1
-        )
-        st.markdown("### 🏬 ობიექტების სქინქეარის საშუალო მაჩვენებლები")
-        cols_skin = st.columns(len(store_skin_merge))
-        for i, row in enumerate(store_skin_merge.itertuples()):
-            cols_skin[i].metric(label=row.ზედდებული, value=f"{row.პროცენტულობა} %")
+        # ⭐ NEW TOTALS SECTION (GLOBAL SKINCARE %)
+        total_skin = df_skincare['თანხა'].sum()
+        total_all = df_full['თანხა'].sum()
+        skin_total_pct = round((total_skin / total_all) * 100, 2)
+        colB.metric("💆‍♀️ საერთო სქინქეარის წილი", f"{skin_total_pct} %")
 
         # --- existing skincare chart ---
         fig2, ax2 = plt.subplots(figsize=(3.5, 2.2))
@@ -209,7 +193,6 @@ if uploaded_file:
             grouped2.to_excel(writer, index=False, sheet_name='ქროს-სელინგი')
             store_grouped.to_excel(writer, index=False, sheet_name='ქროს-სელინგი ობიექტით')
             combined.to_excel(writer, index=False, sheet_name='სქინქეარი')
-            store_skin_merge.to_excel(writer, index=False, sheet_name='სქინქეარი ობიექტით')
         excel_data = output.getvalue()
 
         custom_button = """
